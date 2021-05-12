@@ -31,26 +31,13 @@ const sampleWadmColumns = [
     { title: 'Birth Year 1', field: 'birthYear1', type: 'numeric' },
     { title: 'Birth Year 2', field: 'birthYear2', type: 'numeric' },
     {
-    title: 'Birth Place',
-    field: 'birthCity',
-    lookup: { 34: 'İstanbul', 63: 'Şanlıurfa' },
-    width: 150
+        title: 'Birth Place',
+        field: 'birthCity',
+        width: 150
     },
 ]
 const sampleWadmData = [
     { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthYear1: 1987, birthYear2: 1987, birthCity: 63 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
     { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
 ]
 
@@ -85,6 +72,8 @@ function App() {
                             <WadmTable
                                 wadmColumns={wadmColumns}
                                 wadmData={wadmData}
+                                setWadmColumns={setWadmColumns}
+                                setWadmData={setWadmData}
                             />
                         </Grid>
                     </Box>

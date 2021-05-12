@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import MaterialTable from 'material-table'
 import { makeStyles } from '@material-ui/core/styles';
 
+// TODO: Re-create
+// https://material-ui.com/components/tables/#sorting-amp-selecting
+
 const useStyles = makeStyles({
     stickyActionsColumn: {
       '& table:first-child': {
@@ -22,7 +25,9 @@ const useStyles = makeStyles({
 
 interface WadmTableProps {
     wadmColumns: any,
-    wadmData: any
+    wadmData: any,
+    setWadmColumns: any,
+    setWadmData: any,
 }
 
 function WadmTable({wadmColumns, wadmData}: WadmTableProps) {
@@ -36,12 +41,24 @@ function WadmTable({wadmColumns, wadmData}: WadmTableProps) {
             <MaterialTable
                 title="Wadm"
                 columns={wadmColumns}
-                data={wadmData}    
+                data={wadmData} 
                 options={{
                     maxBodyHeight: height * 0.5,
                     paging: false,
                     search: false,
                 }}
+                cellEditable={{
+                    onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+                        return new Promise((resolve, reject) => {
+                            console.log('newValue: ' + newValue);
+                            console.log('oldValue: ' + oldValue);
+                            console.log(rowData);
+                            console.log(columnDef);
+                            setTimeout(resolve, 1000);
+                        });
+                    }
+                }}
+            
             />
         </div>
     );
