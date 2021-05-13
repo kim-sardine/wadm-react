@@ -69,12 +69,7 @@ function App() {
                     </Box>
                     <Box clone order={{ xs: 1, sm: 2 }}>
                         <Grid item xs={12} sm={6}>
-                            <WadmTable
-                                wadmColumns={wadmColumns}
-                                wadmData={wadmData}
-                                setWadmColumns={setWadmColumns}
-                                setWadmData={setWadmData}
-                            />
+                            <WadmTable />
                         </Grid>
                     </Box>
                     <Box clone order={3}>
