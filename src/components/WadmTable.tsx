@@ -192,6 +192,39 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
     );
 };
 
+interface MyTableRowProps {
+    category: Category,
+    index: number,
+}
+
+const MyTableRow = (props: MyTableRowProps) => {
+    const { category, index } = props;
+
+    return (
+        <TableRow hover key={category.name}>
+            <TableCell align="left">
+                {category.name}
+            </TableCell>
+            {candidates.map((candidate) => (
+                <TableCell align="right">{candidate.values[index]}</TableCell>
+            ))}
+        </TableRow>
+    );
+};
+
+const MyTotalRow = () => {
+    return (
+        <TableRow hover key={"total"}>
+            <TableCell align="left">
+                Total
+            </TableCell>
+            {candidates.map((candidate) => (
+                <TableCell align="right">{candidate.values.reduce((a, b) => a + b, 0)}</TableCell>
+            ))}
+        </TableRow>
+    );
+};
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -267,14 +300,10 @@ export default function WadmTable() {
                     <TableBody>
                         {categories.map((category, row) => { // TODO: Implement Sorting
                             return (
-                                <TableRow hover tabIndex={-1} key={category.name}>
-                                    <TableCell align="left">{category.name}</TableCell>
-                                    {candidates.map((candidate) => (
-                                        <TableCell align="right">{candidate.values[row]}</TableCell>
-                                    ))}
-                                </TableRow>
+                                <MyTableRow category={category} index={row} />
                             );
                         })}
+                        <MyTotalRow />
                     </TableBody>
                 </Table>
             </TableContainer>
