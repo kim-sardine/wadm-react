@@ -22,6 +22,7 @@ interface Candidate {
 }
 interface Category {
     name: string;
+    index: number;
     weight: number;
 }
 
@@ -35,9 +36,10 @@ function createCandidate(
 
 function createCategory(
     name: string,
+    index: number,
     weight: number,
 ): Category {
-    return { name, weight };
+    return { name, index, weight };
 }
 
 const candidates = [
@@ -53,17 +55,26 @@ const candidates = [
 ]
 
 const categories = [
-    createCategory('Cupcake', 305),
-    createCategory('Donut', 452),
-    createCategory('Eclair', 262),
-    createCategory('Frozen yoghurt', 159),
+    createCategory('Cupcake', 0, 5),
+    createCategory('Donut', 1, 4),
+    createCategory('Eclair', 2, 2),
+    createCategory('Frozen yoghurt', 3, 9),
 ]
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-    if (b[orderBy] < a[orderBy]) {
+function descendingComparator(a: Category, b: Category, orderBy: number) {
+    if (orderBy === -1) {
+        if (b.name < a.name) {
+            return -1;
+        }
+        if (b.name > a.name) {
+            return 1;
+        }
+        return 0;
+    }
+    if (candidates[orderBy].values[a.index] < candidates[orderBy].values[b.index]) {
         return -1;
     }
-    if (b[orderBy] > a[orderBy]) {
+    if (candidates[orderBy].values[b.index] < candidates[orderBy].values[a.index]) {
         return 1;
     }
     return 0;
@@ -71,22 +82,28 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 
 type Order = 'asc' | 'desc';
 
-function getComparator<Key extends keyof any>(
+function getComparator(
     order: Order,
-    orderBy: Key,
-): (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number {
+    orderBy: number,
+): (a: Category, b: Category) => number {
+    console.log(order)
+    console.log(orderBy)
     return order === 'desc'
             ? (a, b) => descendingComparator(a, b, orderBy)
             : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
-    const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+function stableSort(array: Category[], comparator: (a: Category, b: Category) => number) {
+    const stabilizedThis = array.map((el, index) => [el, index] as [Category, number]);
+    console.log('stabilizedThis');
+    console.log(stabilizedThis);
     stabilizedThis.sort((a, b) => {
         const order = comparator(a[0], b[0]);
-        if (order !== 0) return order;
-            return a[1] - b[1];
-        });
+        if (order !== 0) {
+            return order;
+        };
+        return a[1] - b[1];
+    });
     return stabilizedThis.map((el) => el[0]);
 }
 
@@ -108,7 +125,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             <TableRow>
                 <TableCell
                     key={-1}
-                    align={'left'}
+                    align={'center'}
                     padding={'default'}
                     sortDirection={orderBy === -1 ? order : false}
                 >
@@ -194,19 +211,21 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
 
 interface MyTableRowProps {
     category: Category,
-    index: number,
 }
 
 const MyTableRow = (props: MyTableRowProps) => {
-    const { category, index } = props;
+    const { category } = props;
 
     return (
         <TableRow hover key={category.name}>
-            <TableCell align="left">
-                {category.name}
+            <TableCell align="center">
+                <div>
+                    <div>{category.name}</div>
+                    <div>{category.weight}</div>
+                </div>
             </TableCell>
             {candidates.map((candidate) => (
-                <TableCell align="right">{candidate.values[index]}</TableCell>
+                <TableCell align="right">{candidate.values[category.index]}</TableCell>
             ))}
         </TableRow>
     );
@@ -215,7 +234,7 @@ const MyTableRow = (props: MyTableRowProps) => {
 const MyTotalRow = () => {
     return (
         <TableRow hover key={"total"}>
-            <TableCell align="left">
+            <TableCell align="center">
                 Total
             </TableCell>
             {candidates.map((candidate) => (
@@ -267,7 +286,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function WadmTable() {
     const classes = useStyles();
     const [order, setOrder] = useState<Order>('asc');
-    const [orderBy, setOrderBy] = useState<number>(1);
+    const [orderBy, setOrderBy] = useState<number>(-1);
     const [dense, setDense] = useState(false);
 
     const handleRequestSort = (event: React.MouseEvent<unknown>, property: number) => {
@@ -298,11 +317,14 @@ export default function WadmTable() {
                         onRequestSort={handleRequestSort}
                     />
                     <TableBody>
-                        {categories.map((category, row) => { // TODO: Implement Sorting
-                            return (
-                                <MyTableRow category={category} index={row} />
-                            );
-                        })}
+                        {
+                            stableSort(categories, getComparator(order, orderBy))
+                                .map((category) => { // TODO: Implement Sorting
+                                    return (
+                                        <MyTableRow category={category} />
+                                    );
+                                })
+                        }
                         <MyTotalRow />
                     </TableBody>
                 </Table>
