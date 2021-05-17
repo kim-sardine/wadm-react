@@ -24,28 +24,54 @@ const useStyles = makeStyles((theme) => ({
 
 const sampleInputMemo = `Some Important memo here`;
 
-const sampleWadmColumns = [
-    { title: 'Name', field: 'name' },
-    { title: 'Surname', field: 'surname' },
-    { title: 'Birth Year', field: 'birthYear', type: 'numeric' },
-    { title: 'Birth Year 1', field: 'birthYear1', type: 'numeric' },
-    { title: 'Birth Year 2', field: 'birthYear2', type: 'numeric' },
-    {
-        title: 'Birth Place',
-        field: 'birthCity',
-        width: 150
-    },
+interface Candidate {
+    name: string;
+    values: Array<number>;
+}
+interface Category {
+    name: string;
+    index: number;
+    weight: number;
+}
+
+
+function createCandidate(
+    name: string,
+    values: Array<number>,
+): Candidate {
+    return { name, values };
+}
+
+function createCategory(
+    name: string,
+    index: number,
+    weight: number,
+): Category {
+    return { name, index, weight };
+}
+
+const sampleCandidates = [
+    createCandidate('ab', [6,5,2,7]),
+    createCandidate('cd', [1,5,2,7]),
+    createCandidate('ef', [6,5,2,7]),
+    createCandidate('gh', [3,5,2,7]),
+    createCandidate('12', [6,6,6,7]),
+    createCandidate('34', [6,5,2,7]),
+    createCandidate('56', [6,5,2,7]),
 ]
-const sampleWadmData = [
-    { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthYear1: 1987, birthYear2: 1987, birthCity: 63 },
-    { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthYear1: 2017, birthYear2: 2017, birthCity: 34 },
+
+const sampleCategories = [
+    createCategory('Cupcake', 0, 5),
+    createCategory('Donut', 1, 4),
+    createCategory('Eclair', 2, 2),
+    createCategory('Frozen yoghurt', 3, 9),
 ]
 
 
 function App() {
     const [inputMemo, setInputMemo] = useState(sampleInputMemo);
-    const [wadmColumns, setWadmColumns] = useState(sampleWadmColumns);
-    const [wadmData, setWadmData] = useState(sampleWadmData);
+    const [candidates, setCandidates] = useState(sampleCandidates);
+    const [categories, setCategories] = useState(sampleCategories);
     
     const onChangeInputMemo = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputMemo(e.target.value);
@@ -69,7 +95,12 @@ function App() {
                     </Box>
                     <Box clone order={{ xs: 1, sm: 2 }}>
                         <Grid item xs={12} sm={6}>
-                            <WadmTable />
+                            <WadmTable
+                                inputCandidates={candidates}
+                                setCandidates={setCandidates}
+                                inputCategories={categories}
+                                setCategories={setCategories}
+                            />
                         </Grid>
                     </Box>
                     <Box clone order={3}>

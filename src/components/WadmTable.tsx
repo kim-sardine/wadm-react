@@ -11,6 +11,7 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import EditIcon from '@material-ui/icons/Edit';
 
 interface Candidate {
     name: string;
@@ -22,40 +23,9 @@ interface Category {
     weight: number;
 }
 
+let candidates: Candidate[]  = [];
 
-function createCandidate(
-    name: string,
-    values: Array<number>,
-): Candidate {
-    return { name, values };
-}
-
-function createCategory(
-    name: string,
-    index: number,
-    weight: number,
-): Category {
-    return { name, index, weight };
-}
-
-const candidates = [
-    createCandidate('ab', [6,5,2,7]),
-    createCandidate('cd', [1,5,2,7]),
-    createCandidate('ef', [6,5,2,7]),
-    createCandidate('gh', [3,5,2,7]),
-    createCandidate('12', [6,6,6,7]),
-    createCandidate('34', [6,5,2,7]),
-    createCandidate('56', [6,5,2,7]),
-    createCandidate('78', [6,5,2,7]),
-    createCandidate('99', [6,5,2,7]),
-]
-
-const categories = [
-    createCategory('Cupcake', 0, 5),
-    createCategory('Donut', 1, 4),
-    createCategory('Eclair', 2, 2),
-    createCategory('Frozen yoghurt', 3, 9),
-]
+let categories: Category[]  = [];
 
 function descendingComparator(a: Category, b: Category, orderBy: number) {
     if (orderBy === -1) {
@@ -82,8 +52,6 @@ function getComparator(
     order: Order,
     orderBy: number,
 ): (a: Category, b: Category) => number {
-    console.log(order)
-    console.log(orderBy)
     return order === 'desc'
             ? (a, b) => descendingComparator(a, b, orderBy)
             : (a, b) => -descendingComparator(a, b, orderBy);
@@ -91,8 +59,6 @@ function getComparator(
 
 function stableSort(array: Category[], comparator: (a: Category, b: Category) => number) {
     const stabilizedThis = array.map((el, index) => [el, index] as [Category, number]);
-    console.log('stabilizedThis');
-    console.log(stabilizedThis);
     stabilizedThis.sort((a, b) => {
         const order = comparator(a[0], b[0]);
         if (order !== 0) {
@@ -148,16 +114,17 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                             active={orderBy === index}
                             direction={orderBy === index ? order : 'asc'}
                             onClick={createSortHandler(index)}
+                            // TODO: LightGrey when inactive
                         >
-                            {candidate.name}
+                            &nbsp;
                             {orderBy === index ? (
+                                // FIXME: Do we need this?
                                 <span className={classes.visuallyHidden}>
                                     {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                                 </span>
                             ) : null}
                         </TableSortLabel>
-                        <div>
-                        </div>
+                        {candidate.name} {/* TODO: In Same Line */}
                     </TableCell>
                 ))}
             </TableRow>
@@ -181,12 +148,13 @@ const MyTableRow = (props: MyTableRowProps) => {
                 </div>
             </TableCell>
             {candidates.map((candidate) => (
-                <TableCell align="right">{candidate.values[category.index]}</TableCell>
+                <TableCell align="right">{candidate.values[category.index]}</TableCell> // TODO: Need Input
             ))}
         </TableRow>
     );
 };
 
+// TODO: Highlight Color
 const MyTotalRow = () => {
     return (
         <TableRow hover key="total">
@@ -223,7 +191,7 @@ const useStyles = makeStyles((theme: Theme) =>
             marginBottom: theme.spacing(2),
         },
         table: {
-            minWidth: 750,
+            // minWidth: 750,
         },
         visuallyHidden: {
             border: 0,
@@ -239,7 +207,20 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export default function WadmTable() {
+interface WadmTableProps {
+    inputCandidates: Candidate[],
+    setCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>,
+    inputCategories: Category[],
+    setCategories: React.Dispatch<React.SetStateAction<Category[]>>,
+}
+
+export default function WadmTable(props: WadmTableProps) {
+
+    const { inputCandidates, setCandidates, inputCategories, setCategories } = props;
+
+    candidates = inputCandidates;
+    categories = inputCategories;
+
     const classes = useStyles();
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<number>(-1);
@@ -250,16 +231,15 @@ export default function WadmTable() {
         setOrderBy(property);
     };
 
-
     return (
         <div className={classes.root}>
             <Paper className={classes.paper}>
                 <TableContainer>
                     <Table
                         className={classes.table}
-                        aria-labelledby="tableTitle"
+                        aria-labelledby="Wadm Table"
                         size="medium"
-                        aria-label="enhanced table"
+                        aria-label="wadm table"
                     >
                         <EnhancedTableHead
                             classes={classes}
@@ -270,7 +250,7 @@ export default function WadmTable() {
                         <TableBody>
                             {
                                 stableSort(categories, getComparator(order, orderBy))
-                                    .map((category) => { // TODO: Implement Sorting
+                                    .map((category) => {
                                         return (
                                             <MyTableRow category={category} />
                                         );
@@ -283,8 +263,8 @@ export default function WadmTable() {
             </Paper>
             <Box textAlign='center'>
                 <ButtonGroup size="large" color="primary" aria-label="large outlined primary button group">
-                    <Button>Add Candidate</Button>
-                    <Button>Add Category</Button>
+                    <Button>Add Candidate (FIXME)</Button>
+                    <Button>Add Category (FIXME)</Button>
                 </ButtonGroup>
             </Box>
         </div>
