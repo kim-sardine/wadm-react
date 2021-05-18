@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
-    Container,
     TextField,
+    Grid,
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -21,13 +21,15 @@ function Title() {
     };
     
     return (
-        <Container maxWidth="sm" component="main" className={classes.heroContent}>
-            <TextField
-                value={title}
-                onChange={onChangeInputData}
-                fullWidth
-            />
-        </Container>
+        <Grid container justify="center" className={classes.heroContent}>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                    value={title}
+                    onChange={onChangeInputData}
+                    fullWidth
+                />
+            </Grid>
+        </Grid>
     );
 }
     

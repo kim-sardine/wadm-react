@@ -8,7 +8,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Title from './components/Title';
 import Memo from './components/Memo';
-import WadmTable from './components/WadmTable'
+import WadmTable, {createCandidate, createCategory} from './components/WadmTable'
 import './App.css';
 
 ReactGA.initialize('###');
@@ -23,32 +23,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const sampleInputMemo = `Some Important memo here`;
-
-interface Candidate {
-    name: string;
-    values: Array<number>;
-}
-interface Category {
-    name: string;
-    index: number;
-    weight: number;
-}
-
-
-function createCandidate(
-    name: string,
-    values: Array<number>,
-): Candidate {
-    return { name, values };
-}
-
-function createCategory(
-    name: string,
-    index: number,
-    weight: number,
-): Category {
-    return { name, index, weight };
-}
 
 const sampleCandidates = [
     createCandidate('ab', [6,5,2,7]),

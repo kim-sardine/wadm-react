@@ -11,7 +11,7 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import EditIcon from '@material-ui/icons/Edit';
+import TextField from '@material-ui/core/TextField';
 
 interface Candidate {
     name: string;
@@ -21,6 +21,22 @@ interface Category {
     name: string;
     index: number;
     weight: number;
+}
+
+
+export function createCandidate(
+    name: string,
+    values: Array<number>,
+): Candidate {
+    return { name, values };
+}
+
+export function createCategory(
+    name: string,
+    index: number,
+    weight: number,
+): Category {
+    return { name, index, weight };
 }
 
 let candidates: Candidate[]  = [];
@@ -105,8 +121,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                 </TableCell>
                 {candidates.map((candidate, index) => (
                     <TableCell
+                        className={classes.tableCell}
                         key={index}
-                        align="right"
+                        align="center"
                         padding="default"
                         sortDirection={orderBy === index ? order : false}
                     >
@@ -116,43 +133,17 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                             onClick={createSortHandler(index)}
                             // TODO: LightGrey when inactive
                         >
-                            &nbsp;
-                            {orderBy === index ? (
-                                // FIXME: Do we need this?
-                                <span className={classes.visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </span>
-                            ) : null}
+                            {candidate.name} {/* TODO: In Same Line */}
                         </TableSortLabel>
-                        {candidate.name} {/* TODO: In Same Line */}
+                        <div className="Wow">
+                            Wow
+                        </div>
                     </TableCell>
                 ))}
             </TableRow>
         </TableHead>
   );
 }
-
-interface MyTableRowProps {
-    category: Category,
-}
-
-const MyTableRow = (props: MyTableRowProps) => {
-    const { category } = props;
-
-    return (
-        <TableRow hover key={category.name}>
-            <TableCell align="center">
-                <div>
-                    <div>{category.name}</div>
-                    <div>{category.weight}</div>
-                </div>
-            </TableCell>
-            {candidates.map((candidate) => (
-                <TableCell align="right">{candidate.values[category.index]}</TableCell> // TODO: Need Input
-            ))}
-        </TableRow>
-    );
-};
 
 // TODO: Highlight Color
 const MyTotalRow = () => {
@@ -162,7 +153,7 @@ const MyTotalRow = () => {
                 Total
             </TableCell>
             {candidates.map((candidate) => (
-                <TableCell align="right">{candidate.values.reduce((a, b) => a + b, 0)}</TableCell>
+                <TableCell align="center">{candidate.values.reduce((a, b) => a + b, 0)}</TableCell>
             ))}
         </TableRow>
     );
@@ -192,6 +183,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         table: {
             // minWidth: 750,
+        },
+        tableCell: {
+            minWidth: 50,
         },
         visuallyHidden: {
             border: 0,
@@ -225,10 +219,33 @@ export default function WadmTable(props: WadmTableProps) {
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<number>(-1);
 
-    const handleRequestSort = (event: React.MouseEvent<unknown>, property: number) => {
+    const handleRequestSort = (e: React.MouseEvent<unknown>, property: number) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
+    };
+
+    const handleValueChange = (value: string, catIdx: number, canIdx: number) => {
+        let newValue = parseInt(value);
+        if (isNaN(newValue)) {
+            newValue = 1;
+        }
+        
+        if (newValue > 10) {
+            newValue = 10;
+        }
+        else if (newValue < 1) {
+            newValue = 1;
+        }
+
+        const targetCandidate = inputCandidates[canIdx];
+        const targetValues = [...targetCandidate.values];
+        targetValues[catIdx] = newValue;
+
+        const udpatedCandidate = createCandidate(targetCandidate.name, targetValues)
+        setCandidates(
+            [...inputCandidates.slice(0, canIdx), udpatedCandidate, ...inputCandidates.slice(canIdx+1)]
+        )
     };
 
     return (
@@ -240,6 +257,7 @@ export default function WadmTable(props: WadmTableProps) {
                         aria-labelledby="Wadm Table"
                         size="medium"
                         aria-label="wadm table"
+                        stickyHeader={true}
                     >
                         <EnhancedTableHead
                             classes={classes}
@@ -252,7 +270,28 @@ export default function WadmTable(props: WadmTableProps) {
                                 stableSort(categories, getComparator(order, orderBy))
                                     .map((category) => {
                                         return (
-                                            <MyTableRow category={category} />
+                                            <TableRow hover key={category.name}>
+                                                <TableCell align="center">
+                                                    <div>
+                                                        <div>{category.name}</div>
+                                                        <div>{category.weight}</div>
+                                                    </div>
+                                                </TableCell>
+                                                {candidates.map((candidate, index) => (
+                                                    <TableCell align="right">
+                                                        <TextField
+                                                            type="number"
+                                                            size="small"
+                                                            margin="none"
+                                                            value={candidate.values[category.index]}
+                                                            onChange={(e) => handleValueChange(e.target.value, category.index, index)}
+                                                            InputProps={
+                                                                { inputProps: { min: "0", max: "10", step: "1" } }
+                                                            }
+                                                        />
+                                                    </TableCell> // TODO: Need Input
+                                                ))}
+                                            </TableRow>
                                         );
                                     })
                             }
