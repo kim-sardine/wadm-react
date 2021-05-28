@@ -228,14 +228,13 @@ export default function WadmTable(props: WadmTableProps) {
     const handleValueChange = (value: string, catIdx: number, canIdx: number) => {
         let newValue = parseInt(value);
         if (isNaN(newValue)) {
-            newValue = 1;
+            newValue = 0;
         }
-        
-        if (newValue > 10) {
-            newValue = 10;
+        else if (newValue > 9) {
+            newValue = 9;
         }
-        else if (newValue < 1) {
-            newValue = 1;
+        else if (newValue < 0) {
+            newValue = 0;
         }
 
         const targetCandidate = inputCandidates[canIdx];
@@ -280,13 +279,13 @@ export default function WadmTable(props: WadmTableProps) {
                                                 {candidates.map((candidate, index) => (
                                                     <TableCell align="right">
                                                         <TextField
-                                                            type="number"
+                                                            type="text"
                                                             size="small"
                                                             margin="none"
                                                             value={candidate.values[category.index]}
                                                             onChange={(e) => handleValueChange(e.target.value, category.index, index)}
                                                             InputProps={
-                                                                { inputProps: { min: "0", max: "10", step: "1" } }
+                                                                { inputProps: { min: "0", max: "9", step: "1" } }
                                                             }
                                                         />
                                                     </TableCell> // TODO: Need Input
