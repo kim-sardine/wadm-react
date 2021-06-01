@@ -299,10 +299,15 @@ export default function WadmTable(props: WadmTableProps) {
                     </Table>
                 </TableContainer>
             </Paper>
-            <Box textAlign='center'>
-                <ButtonGroup size="large" color="primary" aria-label="large outlined primary button group">
-                    <Button>Add Candidate (FIXME)</Button>
+            <Box textAlign='center' m={4}>
+                <ButtonGroup size="large" color="primary" aria-label="large outlined button group">
                     <Button>Add Category (FIXME)</Button>
+                    <Button>Add Candidate (FIXME)</Button>
+                </ButtonGroup>
+            </Box>
+            <Box textAlign='center'>
+                <ButtonGroup size="large" variant="contained" color="secondary" aria-label="contained large button group">
+                    <Button>Clear</Button>
                 </ButtonGroup>
             </Box>
         </div>
