@@ -7,7 +7,6 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import Box from '@material-ui/core/Box';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
@@ -16,6 +15,8 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import SortIcon from '@material-ui/icons/Sort';
+import Grid from '@material-ui/core/Grid';
 
 interface Candidate {
     name: string;
@@ -94,10 +95,11 @@ interface EnhancedTableProps {
     onRequestSort: (property: number) => void;
     order: Order;
     orderBy: number;
+    openUpdateCandidateDialog: (index: number) => void
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-    const { classes, candidates, order, orderBy, onRequestSort } = props;
+    const { classes, candidates, order, orderBy, onRequestSort, openUpdateCandidateDialog} = props;
     const createSortHandler = (property: number) => () => {
         onRequestSort(property);
     };
@@ -111,37 +113,34 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                     padding="default"
                     sortDirection={orderBy === -1 ? order : false}
                 >
-                    <TableSortLabel
-                        active={orderBy === -1}
-                        direction={orderBy === -1 ? order : 'desc'}
-                        onClick={createSortHandler(-1)}
-                    >
-                        {orderBy === -1 ? (
-                            <span className={classes.visuallyHidden}>
-                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                            </span>
-                        ) : null}
-                    </TableSortLabel>
+                    <SortIcon 
+                        fontSize='small'
+                        color={orderBy === -1 ? 'secondary' : 'primary'}
+                        style={{cursor: "pointer"}}
+                        onClick={createSortHandler(-1)} />
                 </TableCell>
                 {candidates.map((candidate, index) => (
                     <TableCell
                         className={classes.tableCell}
                         key={index}
-                        align="center"
                         padding="default"
                         sortDirection={orderBy === index ? order : false}
                     >
-                        <TableSortLabel
-                            active={orderBy === index}
-                            direction={orderBy === index ? order : 'desc'}
-                            onClick={createSortHandler(index)}
-                            // TODO: LightGrey when inactive
-                        >
-                            {candidate.name} {/* TODO: In Same Line */}
-                        </TableSortLabel>
-                        <div className="Wow">
-                            Wow
-                        </div>
+                        <Grid justify="space-between" container >
+                            <Grid item onClick={() => openUpdateCandidateDialog(index)} style={{cursor: "pointer"}}>
+                                <span className="Wow">
+                                    {candidate.name}
+                                </span>
+                            </Grid>
+                            <Grid item>
+                                <SortIcon 
+                                    fontSize='small'
+                                    color={orderBy === index ? 'secondary' : 'primary'}
+                                    style={{cursor: "pointer"}}
+                                    onClick={createSortHandler(index)} />
+                            </Grid>
+
+                        </Grid>
                     </TableCell>
                 ))}
             </TableRow>
@@ -231,6 +230,7 @@ export default function WadmTable(props: WadmTableProps) {
     const [dialogAction, setDialogAction] = useState('');
     const [dialogType, setDialogType] = useState('');
     const [dialogTitle, setDialogTitle] = useState('');
+    const [dialogDeleteButtonVisibility, setDialogDeleteButtonVisibility] = useState('hidden');
     const [userInput, setUserInput] = useState({
         name: '',
         weight: 0,
@@ -249,6 +249,7 @@ export default function WadmTable(props: WadmTableProps) {
         setDialogAction("ADD");
         setDialogType("CATEGORY");
         setDialogTitle("Add New Category");
+        setDialogDeleteButtonVisibility("hidden")
         setOpen(true);
     }
     
@@ -256,18 +257,33 @@ export default function WadmTable(props: WadmTableProps) {
         setDialogAction("ADD");
         setDialogType("CANDIDAITE");
         setDialogTitle("Add New Candidate");
+        setDialogDeleteButtonVisibility("hidden")
         setOpen(true);
     }
 
     function openUpdateCategoryDialog(index: number) {
         setDialogAction("UPDATE");
         setDialogType("CATEGORY");
-        setDialogTitle("Update New Category");
+        setDialogTitle("Update Category");
+        setDialogDeleteButtonVisibility("visible")
         setTargetIndex(index)
         const targetCategory = inputCategories.find((category) => category.index === index);
         setUserInput({
             name: targetCategory? targetCategory.name : '',
             weight: targetCategory? targetCategory.weight : 0
+        })
+        setOpen(true);
+    }
+
+    function openUpdateCandidateDialog(index: number) {
+        setDialogAction("UPDATE");
+        setDialogType("CANDIDATE");
+        setDialogTitle("Update Candidate");
+        setDialogDeleteButtonVisibility("visible")
+        setTargetIndex(index)
+        setUserInput({
+            ...userInput,
+            name: inputCandidates[index].name
         })
         setOpen(true);
     }
@@ -347,9 +363,19 @@ export default function WadmTable(props: WadmTableProps) {
             [newCandidate]
         );
     }
-    
+
+    const handleDelete = () => {
+        // TODO: Implement Here
+        alert('delete!');
+        handleClose();
+    };
 
     const handleDialogSubmit = () => {
+        if (userInput['name'] === '') {
+            alert('No blank name!');
+            return;
+        }
+
         if (dialogAction === 'ADD') {
             if (dialogType === 'CATEGORY') { // Add new category
                 addCategory(userInput['name'], userInput['weight']);
@@ -365,7 +391,8 @@ export default function WadmTable(props: WadmTableProps) {
                     setCategories(inputCategories);
                 }
             } else {  // Update candidate
-                addCandidate(userInput['name']);
+                inputCandidates[targetIndex].name = userInput['name'];
+                setCandidates(inputCandidates);
             }
         }
 
@@ -389,6 +416,7 @@ export default function WadmTable(props: WadmTableProps) {
                             order={order}
                             orderBy={orderBy}
                             onRequestSort={handleRequestSort}
+                            openUpdateCandidateDialog={openUpdateCandidateDialog}
                         />
                         <TableBody>
                             {
@@ -410,9 +438,6 @@ export default function WadmTable(props: WadmTableProps) {
                                                             margin="none"
                                                             value={candidate.values[category.index]}
                                                             onChange={(e) => handleCellValueChange(e.target.value, category.index, index)}
-                                                            InputProps={
-                                                                { inputProps: { min: "0", max: "9", step: "1" } }
-                                                            }
                                                         />
                                                     </TableCell> // TODO: Need Input
                                                 ))}
@@ -460,9 +485,6 @@ export default function WadmTable(props: WadmTableProps) {
                             label="Category Weight"
                             onChange={handleUserInputChange}
                             fullWidth
-                            InputProps={
-                                { inputProps: { min: "0", max: "9", step: "1" } }
-                            }
                         />
                     </>
                         : 
@@ -481,12 +503,17 @@ export default function WadmTable(props: WadmTableProps) {
                 }
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={handleClose} color="primary">
-                    Cancel
-                </Button>
-                <Button onClick={handleDialogSubmit} color="primary">
-                    {dialogAction === "ADD" ? "Add": "Update"}
-                </Button>
+                    <Box flexGrow={1} component="div" visibility={dialogDeleteButtonVisibility}>
+                        <Button onClick={handleDelete} color="secondary">
+                            Delete
+                        </Button>
+                    </Box>
+                    <Button onClick={handleClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDialogSubmit} color="primary">
+                        {dialogAction === "ADD" ? "Add": "Update"}
+                    </Button>
                 </DialogActions>
             </Dialog>
         </div>
