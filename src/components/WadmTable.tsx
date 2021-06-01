@@ -15,7 +15,6 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 interface Candidate {
@@ -46,24 +45,20 @@ export function createCategory(
 
 const defaultScore = 5;
 
-let candidates: Candidate[]  = [];
-
-let categories: Category[]  = [];
-
-function descendingComparator(a: Category, b: Category, orderBy: number) {
+function descendingComparator(candidates: Candidate[], a: Category, b: Category, orderBy: number) {
     if (orderBy === -1) {
-        if (b.name < a.name) {
+        if (b.weight < a.weight) {
             return -1;
         }
-        if (b.name > a.name) {
+        if (b.weight > a.weight) {
             return 1;
         }
         return 0;
     }
-    if (candidates[orderBy].values[a.index] < candidates[orderBy].values[b.index]) {
+    if (candidates[orderBy].values[b.index] < candidates[orderBy].values[a.index]) {
         return -1;
     }
-    if (candidates[orderBy].values[b.index] < candidates[orderBy].values[a.index]) {
+    if (candidates[orderBy].values[a.index] < candidates[orderBy].values[b.index]) {
         return 1;
     }
     return 0;
@@ -72,12 +67,13 @@ function descendingComparator(a: Category, b: Category, orderBy: number) {
 type Order = 'asc' | 'desc';
 
 function getComparator(
+    candidates: Candidate[],
     order: Order,
     orderBy: number,
 ): (a: Category, b: Category) => number {
     return order === 'desc'
-            ? (a, b) => descendingComparator(a, b, orderBy)
-            : (a, b) => -descendingComparator(a, b, orderBy);
+            ? (a, b) => descendingComparator(candidates, a, b, orderBy)
+            : (a, b) => -descendingComparator(candidates, a, b, orderBy);
 }
 
 function stableSort(array: Category[], comparator: (a: Category, b: Category) => number) {
@@ -94,15 +90,16 @@ function stableSort(array: Category[], comparator: (a: Category, b: Category) =>
 
 interface EnhancedTableProps {
     classes: ReturnType<typeof useStyles>;
-    onRequestSort: (event: React.MouseEvent<unknown>, property: number) => void;
+    candidates: Candidate[];
+    onRequestSort: (property: number) => void;
     order: Order;
     orderBy: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-    const { classes, order, orderBy, onRequestSort } = props;
-    const createSortHandler = (property: number) => (event: React.MouseEvent<unknown>) => {
-        onRequestSort(event, property);
+    const { classes, candidates, order, orderBy, onRequestSort } = props;
+    const createSortHandler = (property: number) => () => {
+        onRequestSort(property);
     };
 
     return (
@@ -116,7 +113,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                 >
                     <TableSortLabel
                         active={orderBy === -1}
-                        direction={orderBy === -1 ? order : 'asc'}
+                        direction={orderBy === -1 ? order : 'desc'}
                         onClick={createSortHandler(-1)}
                     >
                         {orderBy === -1 ? (
@@ -136,7 +133,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                     >
                         <TableSortLabel
                             active={orderBy === index}
-                            direction={orderBy === index ? order : 'asc'}
+                            direction={orderBy === index ? order : 'desc'}
                             onClick={createSortHandler(index)}
                             // TODO: LightGrey when inactive
                         >
@@ -152,14 +149,19 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   );
 }
 
+
+interface MyTotalRowProps {
+    candidates: Candidate[];
+}
+
 // TODO: Highlight Color
-const MyTotalRow = () => {
+const MyTotalRow = (props: MyTotalRowProps) => {
     return (
         <TableRow hover key="total">
             <TableCell align="center">
                 Total
             </TableCell>
-            {candidates.map((candidate, index) => (
+            {props.candidates.map((candidate, index) => (
                 <TableCell key={"total" + index} align="center">{candidate.values.reduce((a, b) => a + b, 0)}</TableCell>
             ))}
         </TableRow>
@@ -183,6 +185,9 @@ const useStyles = makeStyles((theme: Theme) =>
                     }
                 }
             }
+        },
+        cursor: {
+            cursor: 'pointer'
         },
         paper: {
             width: '100%',
@@ -219,11 +224,8 @@ export default function WadmTable(props: WadmTableProps) {
 
     const { inputCandidates, setCandidates, inputCategories, setCategories } = props;
 
-    candidates = inputCandidates;
-    categories = inputCategories;
-
     const classes = useStyles();
-    const [order, setOrder] = useState<Order>('asc');
+    const [order, setOrder] = useState<Order>('desc');
     const [orderBy, setOrderBy] = useState<number>(-1);
     const [open, setOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState('');
@@ -233,6 +235,7 @@ export default function WadmTable(props: WadmTableProps) {
         name: '',
         weight: 0,
     });
+    const [targetIndex, setTargetIndex] = useState(0);
 
     const handleClose = () => {
         setUserInput({
@@ -243,16 +246,29 @@ export default function WadmTable(props: WadmTableProps) {
     };
 
     const openAddCategoryDialog = () => {
-        setDialogAction("ADD")
-        setDialogType("CATEGORY")
-        setDialogTitle("Add New Category")
+        setDialogAction("ADD");
+        setDialogType("CATEGORY");
+        setDialogTitle("Add New Category");
         setOpen(true);
     }
     
     const openAddCandidateDialog = () => {
-        setDialogAction("ADD")
-        setDialogType("CANDIDAITE")
-        setDialogTitle("Add New Candidate")
+        setDialogAction("ADD");
+        setDialogType("CANDIDAITE");
+        setDialogTitle("Add New Candidate");
+        setOpen(true);
+    }
+
+    function openUpdateCategoryDialog(index: number) {
+        setDialogAction("UPDATE");
+        setDialogType("CATEGORY");
+        setDialogTitle("Update New Category");
+        setTargetIndex(index)
+        const targetCategory = inputCategories.find((category) => category.index === index);
+        setUserInput({
+            name: targetCategory? targetCategory.name : '',
+            weight: targetCategory? targetCategory.weight : 0
+        })
         setOpen(true);
     }
 
@@ -264,9 +280,9 @@ export default function WadmTable(props: WadmTableProps) {
         setUserInput({...userInput, [e.target.name]: value});
     }
   
-    const handleRequestSort = (e: React.MouseEvent<unknown>, property: number) => {
-        const isAsc = orderBy === property && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
+    const handleRequestSort = (property: number) => {
+        const toAsc = orderBy === property && order === 'desc';
+        setOrder(toAsc ? 'asc' : 'desc');
         setOrderBy(property);
     };
 
@@ -337,7 +353,18 @@ export default function WadmTable(props: WadmTableProps) {
         if (dialogAction === 'ADD') {
             if (dialogType === 'CATEGORY') { // Add new category
                 addCategory(userInput['name'], userInput['weight']);
-            } else {
+            } else { // Add new candidate
+                addCandidate(userInput['name']);
+            }
+        } else {
+            if (dialogType === 'CATEGORY') {  // Update category
+                const targetCategoryIndex = inputCategories.findIndex((category) => category.index === targetIndex);
+                if (targetCategoryIndex !== -1) {
+                    inputCategories[targetCategoryIndex].name = userInput['name'];
+                    inputCategories[targetCategoryIndex].weight = userInput['weight'];
+                    setCategories(inputCategories);
+                }
+            } else {  // Update candidate
                 addCandidate(userInput['name']);
             }
         }
@@ -358,23 +385,24 @@ export default function WadmTable(props: WadmTableProps) {
                     >
                         <EnhancedTableHead
                             classes={classes}
+                            candidates={inputCandidates}
                             order={order}
                             orderBy={orderBy}
                             onRequestSort={handleRequestSort}
                         />
                         <TableBody>
                             {
-                                stableSort(categories, getComparator(order, orderBy))
+                                stableSort(inputCategories, getComparator(inputCandidates, order, orderBy))
                                     .map((category) => {
                                         return (
                                             <TableRow hover key={category.name}>
-                                                <TableCell align="center">
+                                                <TableCell className={classes.cursor} onClick={() => openUpdateCategoryDialog(category.index)} align="center">
                                                     <div>
                                                         <div>{category.name}</div>
                                                         <div>{category.weight}</div>
                                                     </div>
                                                 </TableCell>
-                                                {candidates.map((candidate, index) => (
+                                                {inputCandidates.map((candidate, index) => (
                                                     <TableCell key={category.name + candidate.name + index} align="right">
                                                         <TextField
                                                             type="text"
@@ -392,7 +420,7 @@ export default function WadmTable(props: WadmTableProps) {
                                         );
                                     })
                             }
-                            <MyTotalRow />
+                            <MyTotalRow candidates={inputCandidates} />
                         </TableBody>
                     </Table>
                 </TableContainer>
