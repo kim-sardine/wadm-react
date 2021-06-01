@@ -30,8 +30,6 @@ const sampleCandidates = [
     createCandidate('ef', [6,5,2,7]),
     createCandidate('gh', [3,5,2,7]),
     createCandidate('12', [6,6,6,7]),
-    createCandidate('34', [6,5,2,7]),
-    createCandidate('56', [6,5,2,7]),
 ]
 
 const sampleCategories = [

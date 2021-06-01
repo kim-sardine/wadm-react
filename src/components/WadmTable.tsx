@@ -12,6 +12,11 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 interface Candidate {
     name: string;
@@ -38,6 +43,8 @@ export function createCategory(
 ): Category {
     return { name, index, weight };
 }
+
+const defaultScore = 5;
 
 let candidates: Candidate[]  = [];
 
@@ -152,8 +159,8 @@ const MyTotalRow = () => {
             <TableCell align="center">
                 Total
             </TableCell>
-            {candidates.map((candidate) => (
-                <TableCell align="center">{candidate.values.reduce((a, b) => a + b, 0)}</TableCell>
+            {candidates.map((candidate, index) => (
+                <TableCell key={"total" + index} align="center">{candidate.values.reduce((a, b) => a + b, 0)}</TableCell>
             ))}
         </TableRow>
     );
@@ -172,7 +179,7 @@ const useStyles = makeStyles((theme: Theme) =>
                         zIndex: 999
                     },
                     '& th:first-child': {
-                        zIndex: 9999
+                        zIndex: 1100
                     }
                 }
             }
@@ -218,14 +225,52 @@ export default function WadmTable(props: WadmTableProps) {
     const classes = useStyles();
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<number>(-1);
+    const [open, setOpen] = useState(false);
+    const [dialogAction, setDialogAction] = useState('');
+    const [dialogType, setDialogType] = useState('');
+    const [dialogTitle, setDialogTitle] = useState('');
+    const [userInput, setUserInput] = useState({
+        name: '',
+        weight: 0,
+    });
 
+    const handleClose = () => {
+        setUserInput({
+            name: '',
+            weight: 0,
+        });
+        setOpen(false);
+    };
+
+    const openAddCategoryDialog = () => {
+        setDialogAction("ADD")
+        setDialogType("CATEGORY")
+        setDialogTitle("Add New Category")
+        setOpen(true);
+    }
+    
+    const openAddCandidateDialog = () => {
+        setDialogAction("ADD")
+        setDialogType("CANDIDAITE")
+        setDialogTitle("Add New Candidate")
+        setOpen(true);
+    }
+
+    const handleUserInputChange = (e: any) => {
+        let value = e.target.value;
+        if (e.target.name === 'weight') {
+            value = parseScore(e.target.value);
+        }
+        setUserInput({...userInput, [e.target.name]: value});
+    }
+  
     const handleRequestSort = (e: React.MouseEvent<unknown>, property: number) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
 
-    const handleValueChange = (value: string, catIdx: number, canIdx: number) => {
+    const parseScore = (value: string) => {
         let newValue = parseInt(value);
         if (isNaN(newValue)) {
             newValue = 0;
@@ -236,6 +281,11 @@ export default function WadmTable(props: WadmTableProps) {
         else if (newValue < 0) {
             newValue = 0;
         }
+        return newValue
+    }
+
+    const handleCellValueChange = (value: string, catIdx: number, canIdx: number) => {
+        let newValue = parseScore(value);
 
         const targetCandidate = inputCandidates[canIdx];
         const targetValues = [...targetCandidate.values];
@@ -246,6 +296,54 @@ export default function WadmTable(props: WadmTableProps) {
             [...inputCandidates.slice(0, canIdx), udpatedCandidate, ...inputCandidates.slice(canIdx+1)]
         )
     };
+    
+    const addCategory = (name: string, weight: number) => {
+        const newCategory = createCategory(name, inputCategories.length, weight);
+        setCategories(
+            [...inputCategories, newCategory]
+        );
+        for (const candidate of inputCandidates) {
+            candidate.values.push(defaultScore);
+        }
+        setCandidates(inputCandidates);
+    }
+    
+    const addCandidate = (name: string) => {
+        const values = Array(inputCategories.length);
+        values.fill(defaultScore);
+        const newCandidate = createCandidate(name, values);
+
+        setCandidates(
+            [...inputCandidates, newCandidate]
+        );
+    }
+    
+    const clear = () => {
+        const newCategory = createCategory('New', 0, defaultScore);
+        setCategories(
+            [newCategory]
+        );
+
+        const values = Array(1);
+        values.fill(defaultScore);
+        const newCandidate = createCandidate('New', values);
+        setCandidates(
+            [newCandidate]
+        );
+    }
+    
+
+    const handleDialogSubmit = () => {
+        if (dialogAction === 'ADD') {
+            if (dialogType === 'CATEGORY') { // Add new category
+                addCategory(userInput['name'], userInput['weight']);
+            } else {
+                addCandidate(userInput['name']);
+            }
+        }
+
+        handleClose();
+    }
 
     return (
         <div className={classes.root}>
@@ -277,13 +375,13 @@ export default function WadmTable(props: WadmTableProps) {
                                                     </div>
                                                 </TableCell>
                                                 {candidates.map((candidate, index) => (
-                                                    <TableCell align="right">
+                                                    <TableCell key={category.name + candidate.name + index} align="right">
                                                         <TextField
                                                             type="text"
                                                             size="small"
                                                             margin="none"
                                                             value={candidate.values[category.index]}
-                                                            onChange={(e) => handleValueChange(e.target.value, category.index, index)}
+                                                            onChange={(e) => handleCellValueChange(e.target.value, category.index, index)}
                                                             InputProps={
                                                                 { inputProps: { min: "0", max: "9", step: "1" } }
                                                             }
@@ -301,15 +399,68 @@ export default function WadmTable(props: WadmTableProps) {
             </Paper>
             <Box textAlign='center' m={4}>
                 <ButtonGroup size="large" color="primary" aria-label="large outlined button group">
-                    <Button>Add Category (FIXME)</Button>
-                    <Button>Add Candidate (FIXME)</Button>
+                    <Button onClick={openAddCategoryDialog}>Add Category (FIXME)</Button>
+                    <Button onClick={openAddCandidateDialog}>Add Candidate (FIXME)</Button>
                 </ButtonGroup>
             </Box>
             <Box textAlign='center'>
                 <ButtonGroup size="large" variant="contained" color="secondary" aria-label="contained large button group">
-                    <Button>Clear</Button>
+                    <Button onClick={(e) => clear()}>Clear</Button>
                 </ButtonGroup>
             </Box>
+
+            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">{dialogTitle}</DialogTitle>
+                <DialogContent>
+                {dialogType === "CATEGORY" ? 
+                    <>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            name="name"
+                            type="text"
+                            value={userInput['name']}
+                            label="Category Name"
+                            onChange={handleUserInputChange}
+                            fullWidth
+                        />
+                        <TextField
+                            margin="dense"
+                            name="weight"
+                            type="text"
+                            value={userInput['weight']}
+                            label="Category Weight"
+                            onChange={handleUserInputChange}
+                            fullWidth
+                            InputProps={
+                                { inputProps: { min: "0", max: "9", step: "1" } }
+                            }
+                        />
+                    </>
+                        : 
+                    <>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            name="name"
+                            type="text"
+                            value={userInput['name']}
+                            label="Candidate Name"
+                            onChange={handleUserInputChange}
+                            fullWidth
+                        />
+                    </>
+                }
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={handleClose} color="primary">
+                    Cancel
+                </Button>
+                <Button onClick={handleDialogSubmit} color="primary">
+                    {dialogAction === "ADD" ? "Add": "Update"}
+                </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
