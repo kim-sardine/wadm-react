@@ -351,6 +351,10 @@ export default function WadmTable(props: WadmTableProps) {
     }
     
     const clear = () => {
+        if (window.confirm('Really wanna clear all?') === false) {
+            return
+        }
+
         const newCategory = createCategory('New', 0, defaultScore);
         setCategories(
             [newCategory]
@@ -365,8 +369,11 @@ export default function WadmTable(props: WadmTableProps) {
     }
 
     const handleDelete = () => {
-        // TODO: Implement Here
-        alert('delete!');
+        if (window.confirm(`Really wanna delete '${userInput['name']}' ?`) === true) {
+            setCandidates(
+                [...inputCandidates.slice(0, targetIndex), ...inputCandidates.slice(targetIndex+1)]
+            )
+        }
         handleClose();
     };
 
@@ -452,8 +459,8 @@ export default function WadmTable(props: WadmTableProps) {
             </Paper>
             <Box textAlign='center' m={4}>
                 <ButtonGroup size="large" color="primary" aria-label="large outlined button group">
-                    <Button onClick={openAddCategoryDialog}>Add Category (FIXME)</Button>
-                    <Button onClick={openAddCandidateDialog}>Add Candidate (FIXME)</Button>
+                    <Button onClick={openAddCategoryDialog}>Add Category</Button>
+                    <Button onClick={openAddCandidateDialog}>Add Candidate</Button>
                 </ButtonGroup>
             </Box>
             <Box textAlign='center'>
@@ -504,14 +511,14 @@ export default function WadmTable(props: WadmTableProps) {
                 </DialogContent>
                 <DialogActions>
                     <Box flexGrow={1} component="div" visibility={dialogDeleteButtonVisibility}>
-                        <Button onClick={handleDelete} color="secondary">
+                        <Button onClick={handleDelete} variant="contained" color="secondary">
                             Delete
                         </Button>
                     </Box>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={handleClose} variant="contained">
                         Cancel
                     </Button>
-                    <Button onClick={handleDialogSubmit} color="primary">
+                    <Button onClick={handleDialogSubmit} variant="contained" color="primary">
                         {dialogAction === "ADD" ? "Add": "Update"}
                     </Button>
                 </DialogActions>
