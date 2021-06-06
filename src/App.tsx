@@ -79,6 +79,7 @@ function App() {
                                 setCategories={setCategories}
                             />
                         </Grid>
+                        {/* TODO: Move clean button out here */}
                     </Box>
                     <Box clone order={3}>
                         <Grid item xs={12} sm>
