@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const sampleInputMemo = `Some Important memo here`;
+const sampleTitle = `Title of the wadm table`;
 
 const sampleCandidates = [
     createCandidate('ab', [6,5,2,7]),
@@ -44,7 +45,8 @@ function App() {
     const [inputMemo, setInputMemo] = useState(sampleInputMemo);
     const [candidates, setCandidates] = useState(sampleCandidates);
     const [categories, setCategories] = useState(sampleCategories);
-    
+    const [title, setTitle] = useState(sampleTitle);
+
     const onChangeInputMemo = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputMemo(e.target.value);
     };
@@ -54,7 +56,10 @@ function App() {
     return (
         <div className={classes.content}>
             <Header />
-            <Title />
+            <Title
+                title={title}
+                setTitle={setTitle}
+            />
             <Box m={2}>
                 <Grid container spacing={3} direction="row" justify="center">
                     <Box clone order={{ xs: 2, sm: 1 }}>
