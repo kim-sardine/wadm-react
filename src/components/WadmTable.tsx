@@ -133,8 +133,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                             <Box>
                                 <SortIcon 
                                     fontSize='small'
+                                    className={classes.sortIcon}
                                     color={orderBy === index ? 'secondary' : 'primary'}
-                                    style={{cursor: "pointer"}}
                                     onClick={createSortHandler(index)} />
                             </Box>
 
@@ -194,19 +194,14 @@ const useStyles = makeStyles((theme: Theme) =>
             // minWidth: 750,
         },
         tableCell: {
+            padding: 12,
             minWidth: 50,
         },
-        visuallyHidden: {
-            border: 0,
-            clip: 'rect(0 0 0 0)',
-            height: 1,
-            margin: -1,
-            overflow: 'hidden',
-            padding: 0,
-            position: 'absolute',
-            top: 20,
-            width: 1,
-        },
+        sortIcon: {
+            cursor: "pointer",
+            marginLeft: 12,
+            height: "100%"
+        }
     }),
 );
 

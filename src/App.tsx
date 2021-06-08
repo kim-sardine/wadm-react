@@ -29,18 +29,18 @@ const sampleTitle = `Title of the wadm table`;
 const defaultScore = 5;
 
 const sampleCandidates = [
-    createCandidate('ab', [6,5,2,7]),
-    createCandidate('cd', [1,5,2,7]),
-    createCandidate('ef', [6,5,2,7]),
-    createCandidate('gh', [3,5,2,7]),
-    createCandidate('12', [6,6,6,7]),
+    createCandidate('Company A', [6,5,2,7]),
+    createCandidate('Company B', [9,9,5,4]),
+    createCandidate('Company C', [6,5,6,3]),
+    createCandidate('Company D', [3,5,8,4]),
+    createCandidate('Company E', [4,6,3,7]),
 ]
 
 const sampleCategories = [
-    createCategory('Cupcake', 0, 5),
-    createCategory('Donut', 1, 4),
-    createCategory('Eclair', 2, 2),
-    createCategory('Frozen yoghurt', 3, 9),
+    createCategory('Compensation ', 0, 8),
+    createCategory('Career', 1, 8),
+    createCategory('Dev Culture', 2, 5),
+    createCategory('Location', 3, 3),
 ]
 
 
