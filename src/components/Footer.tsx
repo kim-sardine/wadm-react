@@ -22,7 +22,7 @@ function Footer() {
             <Container maxWidth="md">
                 <Toolbar>
                     <Typography variant="body1" color="inherit">
-                        © 2019 Gistia
+                        © 2021 Sidepun.ch
                     </Typography>
                 </Toolbar>
             </Container>
