@@ -16,7 +16,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import SortIcon from '@material-ui/icons/Sort';
-import Grid from '@material-ui/core/Grid';
 
 interface Candidate {
     name: string;
@@ -230,6 +229,7 @@ export default function WadmTable(props: WadmTableProps) {
     const [dialogAction, setDialogAction] = useState('');
     const [dialogType, setDialogType] = useState('');
     const [dialogTitle, setDialogTitle] = useState('');
+    const [dialogTitleLabel, setDialogTitleLabel] = useState('');
     const [dialogDeleteButtonVisibility, setDialogDeleteButtonVisibility] = useState('hidden');
     const [userInput, setUserInput] = useState({
         name: '',
@@ -249,6 +249,7 @@ export default function WadmTable(props: WadmTableProps) {
         setDialogAction("ADD");
         setDialogType("CATEGORY");
         setDialogTitle("Add New Category");
+        setDialogTitleLabel("Category Name");
         setDialogDeleteButtonVisibility("hidden")
         setOpen(true);
     }
@@ -257,6 +258,7 @@ export default function WadmTable(props: WadmTableProps) {
         setDialogAction("ADD");
         setDialogType("CANDIDAITE");
         setDialogTitle("Add New Candidate");
+        setDialogTitleLabel("Candidate Name");
         setDialogDeleteButtonVisibility("hidden")
         setOpen(true);
     }
@@ -265,6 +267,7 @@ export default function WadmTable(props: WadmTableProps) {
         setDialogAction("UPDATE");
         setDialogType("CATEGORY");
         setDialogTitle("Update Category");
+        setDialogTitleLabel("Category Name");
         setDialogDeleteButtonVisibility("visible")
         setTargetIndex(index)
         const targetCategory = inputCategories.find((category) => category.index === index);
@@ -279,6 +282,7 @@ export default function WadmTable(props: WadmTableProps) {
         setDialogAction("UPDATE");
         setDialogType("CANDIDATE");
         setDialogTitle("Update Candidate");
+        setDialogTitleLabel("Candidate Name");
         setDialogDeleteButtonVisibility("visible")
         setTargetIndex(index)
         setUserInput({
@@ -294,6 +298,12 @@ export default function WadmTable(props: WadmTableProps) {
             value = parseScore(e.target.value);
         }
         setUserInput({...userInput, [e.target.name]: value});
+    }
+
+    const handleKeyPress = (e: any) => {
+        if(e.key === 'Enter'){
+            handleDialogSubmit();
+        }
     }
   
     const handleRequestSort = (property: number) => {
@@ -449,41 +459,29 @@ export default function WadmTable(props: WadmTableProps) {
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">{dialogTitle}</DialogTitle>
                 <DialogContent>
-                {dialogType === "CATEGORY" ? 
-                    <>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            name="name"
-                            type="text"
-                            value={userInput['name']}
-                            label="Category Name"
-                            onChange={handleUserInputChange}
-                            fullWidth
-                        />
-                        <TextField
-                            margin="dense"
-                            name="weight"
-                            type="text"
-                            value={userInput['weight']}
-                            label="Category Weight"
-                            onChange={handleUserInputChange}
-                            fullWidth
-                        />
-                    </>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    name="name"
+                    type="text"
+                    value={userInput['name']}
+                    label={dialogTitleLabel}
+                    onChange={handleUserInputChange}
+                    onKeyPress={handleKeyPress}
+                    fullWidth
+                />
+                {dialogType === "CATEGORY" ?
+                    <TextField
+                        margin="dense"
+                        name="weight"
+                        type="text"
+                        value={userInput['weight']}
+                        label="Category Weight"
+                        onChange={handleUserInputChange}
+                        fullWidth
+                    />
                         : 
-                    <>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            name="name"
-                            type="text"
-                            value={userInput['name']}
-                            label="Candidate Name"
-                            onChange={handleUserInputChange}
-                            fullWidth
-                        />
-                    </>
+                    <></>
                 }
                 </DialogContent>
                 <DialogActions>
