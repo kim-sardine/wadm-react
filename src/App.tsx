@@ -8,6 +8,8 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Title from './components/Title';
 import Memo from './components/Memo';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import WadmTable, {createCandidate, createCategory} from './components/WadmTable'
 import './App.css';
 
@@ -24,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 const sampleInputMemo = `Some Important memo here`;
 const sampleTitle = `Title of the wadm table`;
+const defaultScore = 5;
 
 const sampleCandidates = [
     createCandidate('ab', [6,5,2,7]),
@@ -53,6 +56,24 @@ function App() {
     
     const classes = useStyles();
 
+    const clear = () => {
+        if (window.confirm('Really wanna clear all?') === false) {
+            return
+        }
+
+        const newCategory = createCategory('New', 0, defaultScore);
+        setCategories(
+            [newCategory]
+        );
+
+        const values = Array(1);
+        values.fill(defaultScore);
+        const newCandidate = createCandidate('New', values);
+        setCandidates(
+            [newCandidate]
+        );
+    }
+
     return (
         <div className={classes.content}>
             <Header />
@@ -77,9 +98,14 @@ function App() {
                                 setCandidates={setCandidates}
                                 inputCategories={categories}
                                 setCategories={setCategories}
+                                defaultScore={defaultScore}
                             />
+                            <Box textAlign='center'>
+                                <ButtonGroup size="large" variant="contained" color="secondary" aria-label="contained large button group">
+                                    <Button onClick={(e) => clear()}>Clear</Button>
+                                </ButtonGroup>
+                            </Box>
                         </Grid>
-                        {/* TODO: Move clean button out here */}
                     </Box>
                     <Box clone order={3}>
                         <Grid item xs={12} sm>

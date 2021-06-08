@@ -44,7 +44,6 @@ export function createCategory(
     return { name, index, weight };
 }
 
-const defaultScore = 5;
 
 function descendingComparator(candidates: Candidate[], a: Category, b: Category, orderBy: number) {
     if (orderBy === -1) {
@@ -213,15 +212,16 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface WadmTableProps {
-    inputCandidates: Candidate[],
-    setCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>,
-    inputCategories: Category[],
-    setCategories: React.Dispatch<React.SetStateAction<Category[]>>,
+    inputCandidates: Candidate[];
+    setCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
+    inputCategories: Category[];
+    setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+    defaultScore: number;
 }
 
 export default function WadmTable(props: WadmTableProps) {
 
-    const { inputCandidates, setCandidates, inputCategories, setCategories } = props;
+    const { inputCandidates, setCandidates, inputCategories, setCategories, defaultScore } = props;
 
     const classes = useStyles();
     const [order, setOrder] = useState<Order>('desc');
@@ -349,24 +349,6 @@ export default function WadmTable(props: WadmTableProps) {
             [...inputCandidates, newCandidate]
         );
     }
-    
-    const clear = () => {
-        if (window.confirm('Really wanna clear all?') === false) {
-            return
-        }
-
-        const newCategory = createCategory('New', 0, defaultScore);
-        setCategories(
-            [newCategory]
-        );
-
-        const values = Array(1);
-        values.fill(defaultScore);
-        const newCandidate = createCandidate('New', values);
-        setCandidates(
-            [newCandidate]
-        );
-    }
 
     const handleDelete = () => {
         if (window.confirm(`Really wanna delete '${userInput['name']}' ?`) === true) {
@@ -463,12 +445,6 @@ export default function WadmTable(props: WadmTableProps) {
                     <Button onClick={openAddCandidateDialog}>Add Candidate</Button>
                 </ButtonGroup>
             </Box>
-            <Box textAlign='center'>
-                <ButtonGroup size="large" variant="contained" color="secondary" aria-label="contained large button group">
-                    <Button onClick={(e) => clear()}>Clear</Button>
-                </ButtonGroup>
-            </Box>
-
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">{dialogTitle}</DialogTitle>
                 <DialogContent>
