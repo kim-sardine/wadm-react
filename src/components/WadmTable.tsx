@@ -125,21 +125,21 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                         padding="default"
                         sortDirection={orderBy === index ? order : false}
                     >
-                        <Grid justify="space-between" container >
-                            <Grid item onClick={() => openUpdateCandidateDialog(index)} style={{cursor: "pointer"}}>
+                        <Box display="flex">
+                            <Box flexGrow={1} onClick={() => openUpdateCandidateDialog(index)} style={{cursor: "pointer", textAlign: "center"}}>
                                 <span className="Wow">
                                     {candidate.name}
                                 </span>
-                            </Grid>
-                            <Grid item>
+                            </Box>
+                            <Box>
                                 <SortIcon 
                                     fontSize='small'
                                     color={orderBy === index ? 'secondary' : 'primary'}
                                     style={{cursor: "pointer"}}
                                     onClick={createSortHandler(index)} />
-                            </Grid>
+                            </Box>
 
-                        </Grid>
+                        </Box>
                     </TableCell>
                 ))}
             </TableRow>
@@ -420,13 +420,14 @@ export default function WadmTable(props: WadmTableProps) {
                                                     </div>
                                                 </TableCell>
                                                 {inputCandidates.map((candidate, index) => (
-                                                    <TableCell key={category.name + candidate.name + index} align="right">
+                                                    <TableCell key={category.name + candidate.name + index} align="center">
                                                         <TextField
                                                             type="text"
                                                             size="small"
                                                             margin="none"
                                                             value={candidate.values[category.index]}
                                                             onChange={(e) => handleCellValueChange(e.target.value, category.index, index)}
+                                                            inputProps={{ style: {textAlign: 'center'} }}
                                                         />
                                                     </TableCell> // TODO: Need Input
                                                 ))}
