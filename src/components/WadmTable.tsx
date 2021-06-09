@@ -106,6 +106,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
         <TableHead>
             <TableRow>
                 <TableCell
+                    className={classes.tableCell}
                     key={-1}
                     align="center"
                     padding="default"
@@ -149,17 +150,31 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface MyTotalRowProps {
     candidates: Candidate[];
+    categories: Category[];
+    classes: ReturnType<typeof useStyles>;
 }
 
 // TODO: Highlight Color
 const MyTotalRow = (props: MyTotalRowProps) => {
+    
+    const {candidates, categories} = props;
+
+    let totals = [];
+    for (const candidate of candidates) {
+        let total = 0;
+        for (let i in candidate.values) {
+            total += candidate.values[i] * categories[i].weight;
+        }
+        totals.push(total);
+    }
+
     return (
-        <TableRow hover key="total">
-            <TableCell align="center">
+        <TableRow hover key="total" style={{backgroundColor: '#f5f5f5'}}>
+            <TableCell className={props.classes.tableCell} align="center">
                 Total
             </TableCell>
-            {props.candidates.map((candidate, index) => (
-                <TableCell key={"total" + index} align="center">{candidate.values.reduce((a, b) => a + b, 0)}</TableCell>
+            {totals.map((total, idx) => (
+                <TableCell className={props.classes.tableCell} key={"total" + idx} align="center">{total}</TableCell>
             ))}
         </TableRow>
     );
@@ -196,6 +211,8 @@ const useStyles = makeStyles((theme: Theme) =>
         tableCell: {
             padding: 12,
             minWidth: 50,
+            cursor: 'pointer',
+            border: '1px solid rgba(224, 224, 224, 1)'
         },
         sortIcon: {
             cursor: "pointer",
@@ -418,14 +435,14 @@ export default function WadmTable(props: WadmTableProps) {
                                     .map((category) => {
                                         return (
                                             <TableRow hover key={category.name}>
-                                                <TableCell className={classes.cursor} onClick={() => openUpdateCategoryDialog(category.index)} align="center">
+                                                <TableCell className={classes.tableCell} onClick={() => openUpdateCategoryDialog(category.index)} align="center">
                                                     <div>
                                                         <div>{category.name}</div>
                                                         <div>{category.weight}</div>
                                                     </div>
                                                 </TableCell>
                                                 {inputCandidates.map((candidate, index) => (
-                                                    <TableCell key={category.name + candidate.name + index} align="center">
+                                                    <TableCell className={classes.tableCell} key={category.name + candidate.name + index} align="center">
                                                         <TextField
                                                             type="text"
                                                             size="small"
@@ -440,15 +457,15 @@ export default function WadmTable(props: WadmTableProps) {
                                         );
                                     })
                             }
-                            <MyTotalRow candidates={inputCandidates} />
+                            <MyTotalRow classes={classes} categories={inputCategories} candidates={inputCandidates} />
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Paper>
             <Box textAlign='center' m={4}>
-                <ButtonGroup size="large" color="primary" aria-label="large outlined button group">
-                    <Button onClick={openAddCategoryDialog}>Add Category</Button>
-                    <Button onClick={openAddCandidateDialog}>Add Candidate</Button>
+                <ButtonGroup color="primary" aria-label="outlined button group">
+                    <Button onClick={openAddCategoryDialog}>Add New Category</Button>
+                    <Button onClick={openAddCandidateDialog}>Add New Candidate</Button>
                 </ButtonGroup>
             </Box>
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
