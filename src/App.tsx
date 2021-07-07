@@ -13,8 +13,8 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import WadmTable, {createCandidate, createCategory} from './components/WadmTable'
 import './App.css';
 
-ReactGA.initialize('###');
-ReactGA.pageview('/');
+ReactGA.initialize('G-1R5JRR766P');
+ReactGA.pageview(window.location.pathname + window.location.search);
 
 const useStyles = makeStyles((theme) => ({
     content: {

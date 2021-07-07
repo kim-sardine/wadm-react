@@ -1,6 +1,6 @@
 {
-  "short_name": "RPAP",
-  "name": "Random Picker and Presenter",
+  "short_name": "WADM",
+  "name": "Weighted Average Decision Matrix",
   "icons": [
     {
       "src": "favicon.png",
