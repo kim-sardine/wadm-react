@@ -206,7 +206,16 @@ const useStyles = makeStyles((theme: Theme) =>
             marginBottom: theme.spacing(2),
         },
         table: {
+            wordWrap: 'break-word',
             // minWidth: 750,
+        },
+        tableFirstCell: {
+            padding: 12,
+            cursor: 'pointer',
+            border: '1px solid rgba(224, 224, 224, 1)',
+            [theme.breakpoints.down('sm')]: {
+                maxWidth: 50,
+            }
         },
         tableCell: {
             padding: 12,
@@ -435,7 +444,7 @@ export default function WadmTable(props: WadmTableProps) {
                                     .map((category) => {
                                         return (
                                             <TableRow hover key={category.name}>
-                                                <TableCell className={classes.tableCell} onClick={() => openUpdateCategoryDialog(category.index)} align="center">
+                                                <TableCell className={classes.tableFirstCell} onClick={() => openUpdateCategoryDialog(category.index)} align="center">
                                                     <div>
                                                         <div>{category.name}</div>
                                                         <div>{category.weight}</div>
