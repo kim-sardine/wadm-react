@@ -53,10 +53,11 @@ function Header() {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">{"How to use RPAP"}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">{"How to use WADM"}</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            <img src="/assets/how_to_use.gif" alt="how to use" width="100%" />
+                            TBU
+                            {/* <img src="/assets/how_to_use.gif" alt="how to use" width="100%" />
                             <Typography gutterBottom>
                                 1. Copy data from Excel <br/>
                                 2. Paste it in the input box <br/>
@@ -65,7 +66,7 @@ function Header() {
                                 5. Click the "LET'S START" button on the right <br/>
                                 (You can click "Fullscreen" button on the top right first) <br/>
                                 6. Click the "Next" button to see the next winner. <br/>
-                            </Typography>
+                            </Typography> */}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
