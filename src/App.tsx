@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const sampleInputMemo = `Some Important memo here`;
-const sampleTitle = `Title of the wadm table`;
+const sampleTitle = ``;
 const defaultScore = 5;
 
 const sampleCandidates = [

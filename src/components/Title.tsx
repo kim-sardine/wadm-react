@@ -28,6 +28,7 @@ function Title(props: TitleProps) {
             <Grid item xs={12} sm={6}>
                 <TextField
                     value={props.title}
+                    placeholder={'Title of the wadm table'}
                     onChange={onChangeInputData}
                     fullWidth
                 />
