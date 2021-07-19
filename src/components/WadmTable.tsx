@@ -16,6 +16,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import SortIcon from '@material-ui/icons/Sort';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 
 interface Candidate {
     name: string;
@@ -484,8 +486,8 @@ export default function WadmTable(props: WadmTableProps) {
             </Paper>
             <Box textAlign='center' m={4}>
                 <ButtonGroup color="primary" aria-label="outlined button group">
-                    <Button onClick={openAddCategoryDialog}>Add New Category</Button>
-                    <Button onClick={openAddCandidateDialog}>Add New Candidate</Button>
+                    <Button onClick={openAddCategoryDialog}>Add New Category<ArrowDownwardIcon /></Button>
+                    <Button onClick={openAddCandidateDialog}>Add New Candidate<ArrowForwardIcon /></Button>
                 </ButtonGroup>
             </Box>
             <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">

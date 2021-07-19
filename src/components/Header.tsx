@@ -44,7 +44,7 @@ function Header() {
             <Toolbar className={classes.toolBar}>
                 <Button color="inherit" className={classes.noTransform} target="_blank" href="https://sidepun.ch">sidepun.ch</Button>
                 <Typography component="h1" variant="h6" >
-                    WADM
+                    wadm
                 </Typography>
                 <Button color="inherit" className={classes.noTransform} onClick={handleClickOpen}>How to use</Button>
                 <Dialog
