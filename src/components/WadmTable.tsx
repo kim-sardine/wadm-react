@@ -198,6 +198,12 @@ const useStyles = makeStyles((theme: Theme) =>
                 }
             }
         },
+        modalControl: {
+            display: 'block'
+        },
+        modalAction: {
+            padding: 24
+        },
         cursor: {
             cursor: 'pointer'
         },
@@ -481,6 +487,7 @@ export default function WadmTable(props: WadmTableProps) {
                 <DialogTitle id="form-dialog-title">{dialogTitle}</DialogTitle>
                 <DialogContent>
                 <TextField
+                    className={classes.modalControl}
                     autoFocus
                     margin="dense"
                     name="name"
@@ -493,6 +500,7 @@ export default function WadmTable(props: WadmTableProps) {
                 />
                 {dialogType === "CATEGORY" ?
                     <TextField
+                        className={classes.modalControl}
                         margin="dense"
                         name="weight"
                         type="text"
@@ -505,7 +513,7 @@ export default function WadmTable(props: WadmTableProps) {
                     <></>
                 }
                 </DialogContent>
-                <DialogActions>
+                <DialogActions className={classes.modalAction}>
                     <Box flexGrow={1} component="div" visibility={dialogDeleteButtonVisibility}>
                         <Button onClick={handleDelete} variant="contained" color="secondary">
                             Delete
