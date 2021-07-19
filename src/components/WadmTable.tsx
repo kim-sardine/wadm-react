@@ -260,14 +260,14 @@ export default function WadmTable(props: WadmTableProps) {
     const [dialogDeleteButtonVisibility, setDialogDeleteButtonVisibility] = useState('hidden');
     const [userInput, setUserInput] = useState({
         name: '',
-        weight: 0,
+        weight: 1,
     });
     const [targetIndex, setTargetIndex] = useState(0);
 
     const handleClose = () => {
         setUserInput({
             name: '',
-            weight: 0,
+            weight: 1,
         });
         setOpen(false);
     };
@@ -300,7 +300,7 @@ export default function WadmTable(props: WadmTableProps) {
         const targetCategory = inputCategories.find((category) => category.index === index);
         setUserInput({
             name: targetCategory? targetCategory.name : '',
-            weight: targetCategory? targetCategory.weight : 0
+            weight: targetCategory? targetCategory.weight : 1
         })
         setOpen(true);
     }
@@ -344,8 +344,8 @@ export default function WadmTable(props: WadmTableProps) {
         if (isNaN(newValue)) {
             newValue = 0;
         }
-        else if (newValue > 9) {
-            newValue = 9;
+        else if (newValue > 10) {
+            newValue = 10;
         }
         else if (newValue < 0) {
             newValue = 0;
@@ -398,7 +398,12 @@ export default function WadmTable(props: WadmTableProps) {
 
     const handleDialogSubmit = () => {
         if (userInput['name'] === '') {
-            alert('No blank name!');
+            alert('Name is empty');
+            return;
+        }
+        
+        if (dialogType === 'CATEGORY' && userInput['weight'] < 1) {
+            alert('Weight must be between 1 and 10');
             return;
         }
 
@@ -505,7 +510,7 @@ export default function WadmTable(props: WadmTableProps) {
                         name="weight"
                         type="text"
                         value={userInput['weight']}
-                        label="Category Weight"
+                        label="Category Weight (1 ~ 10)"
                         onChange={handleUserInputChange}
                         fullWidth
                     />
