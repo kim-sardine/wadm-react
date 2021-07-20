@@ -19,11 +19,18 @@ import SortIcon from '@material-ui/icons/Sort';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 
-interface Candidate {
+export interface Wadm {
+    candidates: Candidate[];
+    categories: Category[];
+}
+
+
+export interface Candidate {
     name: string;
     values: Array<number>;
 }
-interface Category {
+
+export interface Category {
     name: string;
     index: number;
     weight: number;
@@ -240,16 +247,14 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface WadmTableProps {
-    inputCandidates: Candidate[];
-    setCandidates: React.Dispatch<React.SetStateAction<Candidate[]>>;
-    inputCategories: Category[];
-    setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+    wadm: Wadm;
+    setWadm: React.Dispatch<React.SetStateAction<Wadm>>;
     defaultScore: number;
 }
 
 export default function WadmTable(props: WadmTableProps) {
 
-    const { inputCandidates, setCandidates, inputCategories, setCategories, defaultScore } = props;
+    const { wadm, setWadm, defaultScore } = props;
 
     const classes = useStyles();
     const [order, setOrder] = useState<Order>('desc');
@@ -299,7 +304,7 @@ export default function WadmTable(props: WadmTableProps) {
         setDialogTitleLabel("Category Name");
         setDialogDeleteButtonVisibility("visible")
         setTargetIndex(index)
-        const targetCategory = inputCategories.find((category) => category.index === index);
+        const targetCategory = wadm.categories.find((category) => category.index === index);
         setUserInput({
             name: targetCategory? targetCategory.name : '',
             weight: targetCategory? targetCategory.weight : 1
@@ -316,7 +321,7 @@ export default function WadmTable(props: WadmTableProps) {
         setTargetIndex(index)
         setUserInput({
             ...userInput,
-            name: inputCandidates[index].name
+            name: wadm.candidates[index].name
         })
         setOpen(true);
     }
@@ -358,42 +363,46 @@ export default function WadmTable(props: WadmTableProps) {
     const handleCellValueChange = (value: string, catIdx: number, canIdx: number) => {
         let newValue = parseScore(value);
 
-        const targetCandidate = inputCandidates[canIdx];
+        const targetCandidate = wadm.candidates[canIdx];
         const targetValues = [...targetCandidate.values];
         targetValues[catIdx] = newValue;
 
         const udpatedCandidate = createCandidate(targetCandidate.name, targetValues)
-        setCandidates(
-            [...inputCandidates.slice(0, canIdx), udpatedCandidate, ...inputCandidates.slice(canIdx+1)]
-        )
+        setWadm({
+            ...wadm,
+            candidates: [...wadm.candidates.slice(0, canIdx), udpatedCandidate, ...wadm.candidates.slice(canIdx+1)]
+        });
     };
     
     const addCategory = (name: string, weight: number) => {
-        const newCategory = createCategory(name, inputCategories.length, weight);
-        setCategories(
-            [...inputCategories, newCategory]
-        );
-        for (const candidate of inputCandidates) {
+        const newCategory = createCategory(name, wadm.categories.length, weight);
+
+        for (const candidate of wadm.candidates) {
             candidate.values.push(defaultScore);
         }
-        setCandidates(inputCandidates);
+        setWadm({
+            categories: [...wadm.categories, newCategory],
+            candidates: wadm.candidates
+        });
     }
     
     const addCandidate = (name: string) => {
-        const values = Array(inputCategories.length);
+        const values = Array(wadm.categories.length);
         values.fill(defaultScore);
         const newCandidate = createCandidate(name, values);
 
-        setCandidates(
-            [...inputCandidates, newCandidate]
-        );
+        setWadm({
+            ...wadm,
+            candidates: [...wadm.candidates, newCandidate]
+        });
     }
 
     const handleDelete = () => {
         if (window.confirm(`Really wanna delete '${userInput['name']}' ?`) === true) {
-            setCandidates(
-                [...inputCandidates.slice(0, targetIndex), ...inputCandidates.slice(targetIndex+1)]
-            )
+            setWadm({
+                ...wadm,
+                candidates: [...wadm.candidates.slice(0, targetIndex), ...wadm.candidates.slice(targetIndex+1)]
+            });
         }
         handleClose();
     };
@@ -417,15 +426,21 @@ export default function WadmTable(props: WadmTableProps) {
             }
         } else {
             if (dialogType === 'CATEGORY') {  // Update category
-                const targetCategoryIndex = inputCategories.findIndex((category) => category.index === targetIndex);
+                const targetCategoryIndex = wadm.categories.findIndex((category) => category.index === targetIndex);
                 if (targetCategoryIndex !== -1) {
-                    inputCategories[targetCategoryIndex].name = userInput['name'];
-                    inputCategories[targetCategoryIndex].weight = userInput['weight'];
-                    setCategories(inputCategories);
+                    wadm.categories[targetCategoryIndex].name = userInput['name'];
+                    wadm.categories[targetCategoryIndex].weight = userInput['weight'];
+                    setWadm({
+                        ...wadm,
+                        categories: wadm.categories
+                    });
                 }
             } else {  // Update candidate
-                inputCandidates[targetIndex].name = userInput['name'];
-                setCandidates(inputCandidates);
+                wadm.candidates[targetIndex].name = userInput['name'];
+                setWadm({
+                    ...wadm,
+                    candidates: wadm.candidates
+                });
             }
         }
 
@@ -445,7 +460,7 @@ export default function WadmTable(props: WadmTableProps) {
                     >
                         <EnhancedTableHead
                             classes={classes}
-                            candidates={inputCandidates}
+                            candidates={wadm.candidates}
                             order={order}
                             orderBy={orderBy}
                             onRequestSort={handleRequestSort}
@@ -453,7 +468,7 @@ export default function WadmTable(props: WadmTableProps) {
                         />
                         <TableBody>
                             {
-                                stableSort(inputCategories, getComparator(inputCandidates, order, orderBy))
+                                stableSort(wadm.categories, getComparator(wadm.candidates, order, orderBy))
                                     .map((category) => {
                                         return (
                                             <TableRow hover key={category.name}>
@@ -463,7 +478,7 @@ export default function WadmTable(props: WadmTableProps) {
                                                         <div>{category.weight}</div>
                                                     </div>
                                                 </TableCell>
-                                                {inputCandidates.map((candidate, index) => (
+                                                {wadm.candidates.map((candidate, index) => (
                                                     <TableCell className={classes.tableCell} key={category.name + candidate.name + index} align="center">
                                                         <TextField
                                                             type="text"
@@ -479,12 +494,12 @@ export default function WadmTable(props: WadmTableProps) {
                                         );
                                     })
                             }
-                            <MyTotalRow classes={classes} categories={inputCategories} candidates={inputCandidates} />
+                            <MyTotalRow classes={classes} categories={wadm.categories} candidates={wadm.candidates} />
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Paper>
-            <Box textAlign='center' m={4}>
+            <Box textAlign='center' m={3}>
                 <ButtonGroup color="primary" aria-label="outlined button group">
                     <Button onClick={openAddCategoryDialog}>Add New Category<ArrowDownwardIcon /></Button>
                     <Button onClick={openAddCandidateDialog}>Add New Candidate<ArrowForwardIcon /></Button>
