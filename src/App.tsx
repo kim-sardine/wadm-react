@@ -9,11 +9,12 @@ import Title from './components/Title';
 import Memo from './components/Memo';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import WadmTable, {createCandidate, createCategory, Wadm} from './components/WadmTable'
+import WadmTable, {createCandidate, createCriterion, Wadm} from './components/WadmTable'
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import { cloneDeep } from 'lodash'
 
 import './App.css';
 
@@ -31,42 +32,61 @@ const useStyles = makeStyles((theme) => ({
 
 const sampleInputMemo = `Some Important memo here`;
 const sampleTitle = ``;
-const defaultScore = 5;
+const defaultScore = 0;
 
 let templates: {[name: string] : Wadm; } = {};
 
 templates["default"] = {
     candidates: [
-        createCandidate('Company A', [6,5,2,7]),
-        createCandidate('Company B', [9,9,5,4]),
-        createCandidate('Company C', [6,5,6,3]),
-        createCandidate('Company D', [3,5,8,4]),
-        createCandidate('Company E', [4,6,3,7]),
+        createCandidate('Candidate 1', [0, 0, 0, 0]),
+        createCandidate('Candidate 2', [0, 0, 0, 0]),
+        createCandidate('Candidate 3', [0, 0, 0, 0]),
+        createCandidate('Candidate 4', [0, 0, 0, 0]),
     ],
-    categories: [
-        createCategory('Compensation', 0, 8),
-        createCategory('Career', 1, 8),
-        createCategory('Dev Culture', 2, 5),
-        createCategory('Location', 3, 3),
+    criteria: [
+        createCriterion('Criteria 1', 0, 5),
+        createCriterion('Criteria 2', 1, 5),
+        createCriterion('Criteria 3', 2, 5),
+        createCriterion('Criteria 4', 3, 5),
+    ]
+}
+
+templates["SW job"] = {
+    candidates: [
+        createCandidate('Microsoft', [0, 0, 0, 0]),
+        createCandidate('Amazon', [0, 0, 0, 0]),
+        createCandidate('Google', [0, 0, 0, 0]),
+        createCandidate('Apple', [0, 0, 0, 0]),
+    ],
+    criteria: [
+        createCriterion('Compensation', 0, 5),
+        createCriterion('Work-life balance', 1, 5),
+        createCriterion('Culture & Values', 2, 5),
+        createCriterion('Career Opportunities', 3, 5),
     ]
 }
 
 function App() {
     const [inputMemo, setInputMemo] = useState(sampleInputMemo);
-    const [wadm, setWadm] = useState(templates["default"]);
+    const [template, setTemplate] = useState('default');
+    const [wadm, setWadm] = useState(cloneDeep(templates[template]));
     const [title, setTitle] = useState(sampleTitle);
-    const [template, setTemplate] = useState('');
     
     const onChangeInputMemo = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputMemo(e.target.value);
     };
     
     const handleChangeTemplate = (e: any) => {
-        if (e.target.value) {
-            if (window.confirm(`Really wanna use template : '${e.target.value}' ?`) === false) {
+        if (e.target.value && Object.keys(templates).includes(e.target.value)) {
+            const newTemplate = e.target.value;
+            if (window.confirm(`Really wanna use template : '${newTemplate}'?\nAll data will be deleted`) === false) {
                 return
             }
-            setTemplate(e.target.value);
+            setTemplate(newTemplate);
+            setWadm(cloneDeep(templates[newTemplate]));
+        }
+        else {
+            alert('Wrong Approach');
         }
     };
 
@@ -77,14 +97,14 @@ function App() {
             return
         }
 
-        const newCategory = createCategory('New', 0, defaultScore);
+        const newCriteria = createCriterion('New', 0, defaultScore);
 
         const values = Array(1);
         values.fill(defaultScore);
         const newCandidate = createCandidate('New', values);
 
         setWadm({
-            categories: [newCategory],
+            criteria: [newCriteria],
             candidates: [newCandidate]
         });
     }
@@ -121,7 +141,7 @@ function App() {
                     </Box>
                 </Grid>
                 <Grid container direction="column" justify="center">
-                    <Box textAlign='center' m={2}>
+                    <Box textAlign='center' m={1}>
                         <FormControl variant="outlined" className={classes.selectTemplate}>
                             <InputLabel id="selete-template-label">Template</InputLabel>
                             <Select
@@ -132,21 +152,17 @@ function App() {
                                 label="Template"
                                 autoWidth
                             >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
+                                {
+                                    Object.keys(templates).map((template) => {
+                                        return (
+                                            <MenuItem value={template}>{template}</MenuItem>
+                                        );
+                                    })
+                                }
                             </Select>
                         </FormControl>
                     </Box>
-                    <Box textAlign='center' m={2}>
-                        <ButtonGroup size="large" variant="contained" color="secondary" aria-label="contained large button group">
-                            <Button onClick={(e) => clear()}>Clear</Button>
-                        </ButtonGroup>
-                    </Box>
-                    <Box textAlign='center' m={2}>
+                    <Box textAlign='center' m={1}>
                         <ButtonGroup size="large" variant="contained" color="secondary" aria-label="contained large button group">
                             <Button onClick={(e) => clear()}>Clear</Button>
                         </ButtonGroup>
