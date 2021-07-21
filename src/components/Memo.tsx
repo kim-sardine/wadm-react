@@ -27,7 +27,7 @@ function Memo(props: MemoProps) {
                 onChange={props.onChangeInputMemo}
                 fullWidth
                 multiline
-                rows={20}
+                rows={3}
                 variant="outlined"
             />
         </Paper>

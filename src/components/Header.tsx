@@ -9,7 +9,8 @@ import {
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle
+    DialogTitle,
+    Hidden
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -43,9 +44,16 @@ function Header() {
         <AppBar position="static" className={classes.appBar}>
             <Toolbar className={classes.toolBar}>
                 <Button color="inherit" className={classes.noTransform} target="_blank" href="https://sidepun.ch">sidepun.ch</Button>
-                <Typography component="h1" variant="h6" >
-                    wadm
-                </Typography>
+                <Hidden mdUp>
+                    <Typography component="h1" variant="h6" >
+                        wadm
+                    </Typography>
+                </Hidden>
+                <Hidden smDown>
+                    <Typography component="h1" variant="h6" >
+                        wadm : weighted average decision matrix
+                    </Typography>
+                </Hidden>
                 <Button color="inherit" className={classes.noTransform} onClick={handleClickOpen}>How to use</Button>
                 <Dialog
                     open={open}
