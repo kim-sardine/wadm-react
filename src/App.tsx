@@ -135,15 +135,24 @@ function App() {
     }
 
     const exportWadm = (e: any) => {
-        let output = JSON.stringify({wadm: wadm, inputMemo: inputMemo}, null, 4);
+        let output = JSON.stringify({wadm: wadm, inputMemo: inputMemo, title: title}, null, 4);
         
         const blob = new Blob([output]);
         const fileDownloadUrl = URL.createObjectURL(blob);
         const element = document.createElement("a");
         element.href = fileDownloadUrl;
 
-        let filename = title || new Date().toLocaleString().replace(/[, /:]/g, '_');
-        element.download = filename + '.wadm'
+        let filename = title;
+        if (filename !== '') {
+            filename += '_';
+        }
+
+        let today = new Date();
+        let date = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
+        let time = today.getHours() + '_' + today.getMinutes() + '_' + today.getSeconds();
+        filename += date + '__' + time;
+
+        element.download = filename + '.json'
         document.body.appendChild(element);
         element.click(); 
         URL.revokeObjectURL(fileDownloadUrl);  // free up storage--no longer needed.
@@ -158,8 +167,9 @@ function App() {
     const handleFileRead = (e: any) => {
         const content = fileReader.result;
         const loadedWadm = JSON.parse(String(content));
-        setWadm(cloneDeep(loadedWadm['wadm']));
+        setTitle(loadedWadm['title']);
         setInputMemo(loadedWadm['inputMemo']);
+        setWadm(cloneDeep(loadedWadm['wadm']));
     };
 
     const handleFileChosen = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,12 +177,6 @@ function App() {
 
         const file = e.target.files[0];
         if (file !== undefined) {
-            const dotIndex = file.name.lastIndexOf('.')
-            let filename = file.name;
-            if (dotIndex > 0) {
-                filename = filename.slice(0, dotIndex);
-            }
-            setTitle(filename);
             fileReader = new FileReader();
             fileReader.onloadend = handleFileRead;
             fileReader.readAsText(file);
@@ -248,7 +252,7 @@ function App() {
             <Footer />
             <input type="file" style={{display: "none"}}
                 multiple={false}
-                accept=".wadm"
+                accept="application/JSON"
                 onChange={handleFileChosen}
                 ref={fileRef}
             />
