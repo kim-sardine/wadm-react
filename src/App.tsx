@@ -151,6 +151,7 @@ function App() {
         let date = today.getFullYear()+'_'+(today.getMonth()+1)+'_'+today.getDate();
         let time = today.getHours() + '_' + today.getMinutes() + '_' + today.getSeconds();
         filename += date + '__' + time;
+        filename = 'wadm_' + filename;
 
         element.download = filename + '.json'
         document.body.appendChild(element);
