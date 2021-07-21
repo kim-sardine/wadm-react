@@ -540,7 +540,7 @@ export default function WadmTable(props: WadmTableProps) {
                         name="weight"
                         type="text"
                         value={userInput['weight']}
-                        label="Criterion Weight (1 ~ 10)"
+                        label="Criteria Weight (1 ~ 10)"
                         onChange={handleUserInputChange}
                         fullWidth
                     />

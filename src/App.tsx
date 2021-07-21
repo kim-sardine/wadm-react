@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { Grid, Box } from '@material-ui/core';
+import { lightBlue, cyan } from '@material-ui/core/colors';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -30,8 +31,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const sampleInputMemo = `Some Important memo here`;
-const sampleTitle = ``;
+const defaultInputMemo = `memo here`;
+const defaultTitle = ``;
 const defaultScore = 0;
 
 let templates: {[name: string] : Wadm; } = {};
@@ -66,11 +67,33 @@ templates["SW job"] = {
     ]
 }
 
+const LightBlueButton = withStyles((theme) => ({
+    root: {
+      color: theme.palette.getContrastText(lightBlue[700]),
+      backgroundColor: lightBlue[700],
+      '&:hover': {
+        backgroundColor: lightBlue[900],
+      },
+    },
+  }))(Button);
+
+const CyanButton = withStyles((theme) => ({
+    root: {
+      color: theme.palette.getContrastText(cyan[700]),
+      backgroundColor: cyan[700],
+      '&:hover': {
+        backgroundColor: cyan[900],
+      },
+    },
+  }))(Button);
+
 function App() {
-    const [inputMemo, setInputMemo] = useState(sampleInputMemo);
+    const [inputMemo, setInputMemo] = useState(defaultInputMemo);
     const [template, setTemplate] = useState('default');
     const [wadm, setWadm] = useState(cloneDeep(templates[template]));
-    const [title, setTitle] = useState(sampleTitle);
+    const [title, setTitle] = useState(defaultTitle);
+    const fileRef = useRef<HTMLInputElement>(null);
+
     
     const onChangeInputMemo = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputMemo(e.target.value);
@@ -103,11 +126,58 @@ function App() {
         values.fill(defaultScore);
         const newCandidate = createCandidate('New', values);
 
+        setTitle(defaultTitle);
+        setInputMemo(defaultInputMemo);
         setWadm({
             criteria: [newCriteria],
             candidates: [newCandidate]
         });
     }
+
+    const exportWadm = (e: any) => {
+        let output = JSON.stringify({wadm: wadm, inputMemo: inputMemo}, null, 4);
+        
+        const blob = new Blob([output]);
+        const fileDownloadUrl = URL.createObjectURL(blob);
+        const element = document.createElement("a");
+        element.href = fileDownloadUrl;
+
+        let filename = title || new Date().toLocaleString().replace(/[, /:]/g, '_');
+        element.download = filename + '.wadm'
+        document.body.appendChild(element);
+        element.click(); 
+        URL.revokeObjectURL(fileDownloadUrl);  // free up storage--no longer needed.
+    }
+
+    const importWadm = (e: any) => {
+        fileRef?.current?.click();
+    }
+
+    let fileReader = new FileReader();
+  
+    const handleFileRead = (e: any) => {
+        const content = fileReader.result;
+        const loadedWadm = JSON.parse(String(content));
+        setWadm(cloneDeep(loadedWadm['wadm']));
+        setInputMemo(loadedWadm['inputMemo']);
+    };
+
+    const handleFileChosen = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) return;
+
+        const file = e.target.files[0];
+        if (file !== undefined) {
+            const dotIndex = file.name.lastIndexOf('.')
+            let filename = file.name;
+            if (dotIndex > 0) {
+                filename = filename.slice(0, dotIndex);
+            }
+            setTitle(filename);
+            fileReader = new FileReader();
+            fileReader.onloadend = handleFileRead;
+            fileReader.readAsText(file);
+        }
+    };
 
     return (
         <div className={classes.content}>
@@ -163,6 +233,12 @@ function App() {
                         </FormControl>
                     </Box>
                     <Box textAlign='center' m={1}>
+                        <ButtonGroup variant="contained" aria-label="contained button group">
+                            <LightBlueButton onClick={exportWadm}>Export</LightBlueButton>
+                            <CyanButton onClick={importWadm}>Import</CyanButton>
+                        </ButtonGroup>
+                    </Box>
+                    <Box textAlign='center' m={3}>
                         <ButtonGroup size="large" variant="contained" color="secondary" aria-label="contained large button group">
                             <Button onClick={(e) => clear()}>Clear</Button>
                         </ButtonGroup>
@@ -170,6 +246,12 @@ function App() {
                 </Grid>
             </Box>
             <Footer />
+            <input type="file" style={{display: "none"}}
+                multiple={false}
+                accept=".wadm"
+                onChange={handleFileChosen}
+                ref={fileRef}
+            />
         </div>
     );
 }
