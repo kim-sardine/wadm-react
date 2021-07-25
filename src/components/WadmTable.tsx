@@ -114,7 +114,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
         <TableHead>
             <TableRow>
                 <TableCell
-                    className={classes.tableCell}
+                    className={classes.tableFirstCell}
                     key={-1}
                     align="center"
                     padding="default"
@@ -134,7 +134,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                         sortDirection={orderBy === index ? order : false}
                     >
                         <Box display="flex">
-                            <Box flexGrow={1} onClick={() => openUpdateCandidateDialog(index)} style={{cursor: "pointer", textAlign: "center"}}>
+                            <Box flexGrow={1} onClick={() => openUpdateCandidateDialog(index)} className={classes.tableHeadCell}>
                                 <span className="Wow">
                                     {candidate.name}
                                 </span>
@@ -177,7 +177,7 @@ const MyTotalRow = (props: MyTotalRowProps) => {
 
     return (
         <TableRow hover key="total" style={{backgroundColor: '#f5f5f5'}}>
-            <TableCell className={props.classes.tableCell} align="center">
+            <TableCell className={props.classes.tableFirstCell} align="center">
                 Total
             </TableCell>
             {totals.map((total, idx) => (
@@ -219,8 +219,12 @@ const useStyles = makeStyles((theme: Theme) =>
             marginBottom: theme.spacing(2),
         },
         table: {
-            wordWrap: 'break-word',
-            // minWidth: 750,
+            overflowWrap: 'break-word',
+        },
+        tableHeadCell: {
+            lineHeight: '26px',
+            cursor: 'pointer',
+            textAlign: 'center',
         },
         tableFirstCell: {
             padding: '16px 12px',
@@ -233,14 +237,15 @@ const useStyles = makeStyles((theme: Theme) =>
             }
         },
         tableCell: {
-            padding: 12,
-            minWidth: 50,
+            padding: 8,
+            minWidth: 120,
+            maxWidth: 160,
             cursor: 'pointer',
             border: '1px solid rgba(224, 224, 224, 1)'
         },
         sortIcon: {
             cursor: "pointer",
-            marginLeft: 12,
+            marginLeft: 4,
             height: "100%"
         }
     }),

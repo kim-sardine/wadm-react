@@ -31,13 +31,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const defaultInputMemo = `memo here`;
-const defaultTitle = ``;
+const defaultInputMemo = 'memo here';
+const defaultTitle = '';
+const defaultTemplate = 'Default';
 const defaultScore = 0;
 
 let templates: {[name: string] : Wadm; } = {};
 
-templates["default"] = {
+templates[defaultTemplate] = {
     candidates: [
         createCandidate('Candidate 1', [0, 0, 0, 0]),
         createCandidate('Candidate 2', [0, 0, 0, 0]),
@@ -52,18 +53,49 @@ templates["default"] = {
     ]
 }
 
-templates["SW job"] = {
+templates["Career"] = {
     candidates: [
-        createCandidate('Microsoft', [0, 0, 0, 0]),
-        createCandidate('Amazon', [0, 0, 0, 0]),
-        createCandidate('Google', [0, 0, 0, 0]),
-        createCandidate('Apple', [0, 0, 0, 0]),
+        createCandidate('A', [0, 0, 0, 0]),
+        createCandidate('B', [0, 0, 0, 0]),
+        createCandidate('C', [0, 0, 0, 0]),
+        createCandidate('D', [0, 0, 0, 0]),
     ],
     criteria: [
         createCriterion('Compensation', 0, 5),
         createCriterion('Work-life balance', 1, 5),
         createCriterion('Culture & Values', 2, 5),
         createCriterion('Career Opportunities', 3, 5),
+    ]
+}
+
+templates["SW Career"] = {
+    candidates: [
+        createCandidate('A', [0, 0, 0, 0]),
+        createCandidate('B', [0, 0, 0, 0]),
+        createCandidate('C', [0, 0, 0, 0]),
+        createCandidate('D', [0, 0, 0, 0]),
+    ],
+    criteria: [
+        createCriterion('Compensation', 0, 5),
+        createCriterion('Work-life balance', 1, 5),
+        createCriterion('Culture & Values', 2, 5),
+        createCriterion('Career Opportunities', 3, 5),
+    ]
+}
+
+templates["Moving House"] = {
+    candidates: [
+        createCandidate('A', [0, 0, 0, 0, 0, 0]),
+        createCandidate('B', [0, 0, 0, 0, 0, 0]),
+        createCandidate('C', [0, 0, 0, 0, 0, 0]),
+    ],
+    criteria: [
+        createCriterion('Price', 0, 5),
+        createCriterion('Near Work', 1, 5),
+        createCriterion('Near Schools', 2, 5),
+        createCriterion('Near Nature', 3, 5),
+        createCriterion('Potential', 4, 5),
+        createCriterion('Parking', 5, 5),
     ]
 }
 
@@ -89,7 +121,7 @@ const CyanButton = withStyles((theme) => ({
 
 function App() {
     const [inputMemo, setInputMemo] = useState(defaultInputMemo);
-    const [template, setTemplate] = useState('default');
+    const [template, setTemplate] = useState(defaultTemplate);
     const [wadm, setWadm] = useState(cloneDeep(templates[template]));
     const [title, setTitle] = useState(defaultTitle);
     const fileRef = useRef<HTMLInputElement>(null);
