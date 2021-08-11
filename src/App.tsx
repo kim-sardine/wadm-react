@@ -250,10 +250,10 @@ function App() {
                 <Grid container direction="column" justify="center">
                     <Box textAlign='center' m={1}>
                         <FormControl variant="outlined" className={classes.selectTemplate}>
-                            <InputLabel id="selete-template-label">Template</InputLabel>
+                            <InputLabel id="select-template-label">Template</InputLabel>
                             <Select
-                                labelId="selete-template-label"
-                                id="selete-template"
+                                labelId="select-template-label"
+                                id="select-template"
                                 value={template}
                                 onChange={handleChangeTemplate}
                                 label="Template"
