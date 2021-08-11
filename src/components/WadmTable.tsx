@@ -178,10 +178,12 @@ const MyTotalRow = (props: MyTotalRowProps) => {
     return (
         <TableRow hover key="total" style={{backgroundColor: '#f5f5f5'}}>
             <TableCell className={props.classes.tableFirstCell} align="center">
-                Total
+                <strong>Total</strong>
             </TableCell>
             {totals.map((total, idx) => (
-                <TableCell className={props.classes.tableCell} key={"total" + idx} align="center">{total}</TableCell>
+                <TableCell className={props.classes.tableCell} key={"total" + idx} align="center">
+                    <strong>{total}</strong>
+                </TableCell>
             ))}
         </TableRow>
     );
@@ -241,7 +243,8 @@ const useStyles = makeStyles((theme: Theme) =>
             minWidth: 120,
             maxWidth: 160,
             cursor: 'pointer',
-            border: '1px solid rgba(224, 224, 224, 1)'
+            border: '1px solid rgba(224, 224, 224, 1)',
+            backgroundColor: 'white'
         },
         sortIcon: {
             cursor: "pointer",
@@ -467,6 +470,7 @@ export default function WadmTable(props: WadmTableProps) {
                 <TableContainer>
                     <Table
                         className={classes.table}
+                        id="wadm-table"
                         aria-labelledby="Wadm Table"
                         size="medium"
                         aria-label="wadm table"

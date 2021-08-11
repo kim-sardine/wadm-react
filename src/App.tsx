@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { Grid, Box } from '@material-ui/core';
-import { lightBlue, cyan } from '@material-ui/core/colors';
+import { lightBlue, cyan, teal } from '@material-ui/core/colors';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -16,6 +16,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { cloneDeep } from 'lodash'
+import domtoimage from 'dom-to-image';
 
 import './App.css';
 
@@ -99,8 +100,24 @@ templates["Moving House"] = {
     ]
 }
 
+const commonStyles = {
+    fontSize: '12px'
+}
+
+const TealButton = withStyles((theme) => ({
+    root: {
+        ...commonStyles,
+      color: theme.palette.getContrastText(teal[700]),
+      backgroundColor: teal[700],
+      '&:hover': {
+        backgroundColor: teal[900],
+      },
+    },
+  }))(Button);
+
 const LightBlueButton = withStyles((theme) => ({
     root: {
+        ...commonStyles,
       color: theme.palette.getContrastText(lightBlue[700]),
       backgroundColor: lightBlue[700],
       '&:hover': {
@@ -111,6 +128,7 @@ const LightBlueButton = withStyles((theme) => ({
 
 const CyanButton = withStyles((theme) => ({
     root: {
+        ...commonStyles,
       color: theme.palette.getContrastText(cyan[700]),
       backgroundColor: cyan[700],
       '&:hover': {
@@ -164,16 +182,10 @@ function App() {
             criteria: [newCriteria],
             candidates: [newCandidate]
         });
+
     }
 
-    const exportWadm = (e: any) => {
-        let output = JSON.stringify({wadm: wadm, inputMemo: inputMemo, title: title}, null, 4);
-        
-        const blob = new Blob([output]);
-        const fileDownloadUrl = URL.createObjectURL(blob);
-        const element = document.createElement("a");
-        element.href = fileDownloadUrl;
-
+    function createFilename(): string {
         let filename = title;
         if (filename !== '') {
             filename += '_';
@@ -185,13 +197,41 @@ function App() {
         filename += date + '__' + time;
         filename = 'wadm_' + filename;
 
+        return filename;
+    }
+
+    const exportWadmAsImage = (e: any) => {
+        
+        var node = document.getElementById('wadm-table');
+        if (!node) return;
+
+        let filename = createFilename();
+
+        domtoimage.toJpeg(node).then(function (dataUrl) {
+            var link = document.createElement('a');
+            link.download = `${filename}.jpeg`;
+            link.href = dataUrl;
+            link.click();
+        });
+    }
+
+    const exportWadmAsJson = (e: any) => {
+        let output = JSON.stringify({wadm: wadm, inputMemo: inputMemo, title: title}, null, 4);
+        
+        const blob = new Blob([output]);
+        const fileDownloadUrl = URL.createObjectURL(blob);
+        const element = document.createElement("a");
+        element.href = fileDownloadUrl;
+
+        let filename = createFilename();
+
         element.download = filename + '.json'
         document.body.appendChild(element);
         element.click(); 
         URL.revokeObjectURL(fileDownloadUrl);  // free up storage--no longer needed.
     }
 
-    const importWadm = (e: any) => {
+    const importJson = (e: any) => {
         fileRef?.current?.click();
     }
 
@@ -271,8 +311,9 @@ function App() {
                     </Box>
                     <Box textAlign='center' m={1}>
                         <ButtonGroup variant="contained" aria-label="contained button group">
-                            <LightBlueButton onClick={exportWadm}>Export</LightBlueButton>
-                            <CyanButton onClick={importWadm}>Import</CyanButton>
+                            <TealButton onClick={exportWadmAsImage}>Export as image</TealButton>
+                            <CyanButton onClick={exportWadmAsJson}>Export as json</CyanButton>
+                            <LightBlueButton onClick={importJson}>Import json</LightBlueButton>
                         </ButtonGroup>
                     </Box>
                     <Box textAlign='center' m={3}>
