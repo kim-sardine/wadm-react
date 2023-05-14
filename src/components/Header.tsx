@@ -1,16 +1,17 @@
 import React, {useState} from 'react';
+import { useTheme, useMediaQuery } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     AppBar,
     Toolbar,
     Button,
+    Box,
     Typography,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle,
-    Hidden
+    DialogTitle
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -29,8 +30,8 @@ const useStyles = makeStyles((theme) => ({
 function Header() {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
-    // const theme = useTheme();
-    // const isXsSize = useMediaQuery(theme.breakpoints.down('xs'));
+    const theme = useTheme();
+    const xsDown = useMediaQuery(theme.breakpoints.down('xs'));
 
     const handleClickOpen = () => {
       setOpen(true);
@@ -43,17 +44,12 @@ function Header() {
     return (
         <AppBar position="static" className={classes.appBar}>
             <Toolbar className={classes.toolBar}>
-                <Button color="inherit" className={classes.noTransform} target="_blank" href="https://sidepun.ch">sidepun.ch</Button>
-                <Hidden mdUp>
-                    <Typography component="h1" variant="h6" >
-                        wadm
-                    </Typography>
-                </Hidden>
-                <Hidden smDown>
-                    <Typography component="h1" variant="h6" >
-                        wadm : weighted average decision matrix
-                    </Typography>
-                </Hidden>
+                <Button color="inherit" className={classes.noTransform} target="_blank" href="https://sidepunch.co">sidepunch.co</Button>
+                <Typography component="h1" variant="h6" >
+                    <Box>
+                        {xsDown ? <Box>wadm</Box> : <Box>wadm : weighted average decision matrix</Box>}
+                    </Box>
+                </Typography>
                 <Button color="inherit" className={classes.noTransform} onClick={handleClickOpen}>How to use</Button>
                 <Dialog
                     open={open}

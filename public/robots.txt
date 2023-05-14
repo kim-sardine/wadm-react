@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://wadm.sidepun.ch/sitemap.xml
+Sitemap: https://wadm.sidepunch.co/sitemap.xml

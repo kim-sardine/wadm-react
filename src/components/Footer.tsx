@@ -22,7 +22,7 @@ function Footer() {
             <Container maxWidth="md">
                 <Toolbar>
                     <Typography variant="body1" color="inherit">
-                        © 2021 Sidepun.ch
+                        © 2021 SidePunch
                     </Typography>
                 </Toolbar>
             </Container>

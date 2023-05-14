@@ -264,7 +264,7 @@ function App() {
                 setTitle={setTitle}
             />
             <Box m={2}>
-                <Grid container spacing={3} direction="row" justify="center">
+                <Grid container spacing={3} direction="row">
                     <Box clone order={{ xs: 2, sm: 1 }}>
                         <Grid item xs={12} sm>
                             <Memo
@@ -287,8 +287,8 @@ function App() {
                         </Grid>
                     </Box>
                 </Grid>
-                <Grid container direction="column" justify="center">
-                    <Box textAlign='center' m={1}>
+                <Grid container direction="column" style={{textAlign: "center"}}>
+                    <Box m={1}>
                         <FormControl variant="outlined" className={classes.selectTemplate}>
                             <InputLabel id="select-template-label">Template</InputLabel>
                             <Select
@@ -309,14 +309,14 @@ function App() {
                             </Select>
                         </FormControl>
                     </Box>
-                    <Box textAlign='center' m={1}>
+                    <Box m={1}  style={{marginTop: "16px", marginBottom: "16px"}}>
                         <ButtonGroup variant="contained" aria-label="contained button group">
                             <TealButton onClick={exportWadmAsImage}>Export as image</TealButton>
                             <CyanButton onClick={exportWadmAsJson}>Export as json</CyanButton>
                             <LightBlueButton onClick={importJson}>Import json</LightBlueButton>
                         </ButtonGroup>
                     </Box>
-                    <Box textAlign='center' m={3}>
+                    <Box m={3}>
                         <ButtonGroup size="large" variant="contained" color="secondary" aria-label="contained large button group">
                             <Button onClick={(e) => clear()}>Clear</Button>
                         </ButtonGroup>

@@ -521,7 +521,7 @@ export default function WadmTable(props: WadmTableProps) {
                     </Table>
                 </TableContainer>
             </Paper>
-            <Box textAlign='center' m={3}>
+            <Box m={3} style={{textAlign: "center", marginTop: "16px", marginBottom: "16px"}}>
                 <ButtonGroup color="primary" aria-label="outlined button group">
                     <Button onClick={openAddCriterionDialog}>Add New Criteria<ArrowDownwardIcon /></Button>
                     <Button onClick={openAddCandidateDialog}>Add New Candidate<ArrowForwardIcon /></Button>
